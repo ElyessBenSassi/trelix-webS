@@ -1,0 +1,23 @@
+<h1>Liste des Modules</h1>
+<a href="{% url 'module_create' %}">Créer un nouveau module</a>
+<table border="1">
+<tr>
+    <th>URI</th>
+    <th>Nom Module</th>
+    <th>Nom Cours</th>
+    <th>Contenu</th>
+    <th>Actions</th>
+</tr>
+{% for m in modules %}
+<tr>
+    <td>{{ m.uri }}</td>
+    <td>{{ m.nomModule }}</td>
+    <td>{{ m.NomCours }}</td>
+    <td>{{ m.Contenu }}</td>
+    <td>
+        <a href="{% url 'module_update' %}?uri={{ m.uri|urlencode }}">Edit</a> |
+        <a href="{% url 'module_delete' %}?uri={{ m.uri|urlencode }}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>

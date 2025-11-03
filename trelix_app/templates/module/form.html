@@ -1,0 +1,12 @@
+<h1>{% if module %}Modifier{% else %}Créer{% endif %} Module</h1>
+<form method="post">
+    {% csrf_token %}
+    <label>Nom Module:</label>
+    <input type="text" name="nomModule" value="{{ module.nomModule|default:'' }}" required><br>
+    <label>Nom Cours:</label>
+    <input type="text" name="NomCours" value="{{ module.NomCours|default:'' }}" required><br>
+    <label>Contenu:</label>
+    <input type="text" name="Contenu" value="{{ module.Contenu|default:'' }}" required><br>
+    <button type="submit">{% if module %}Modifier{% else %}Créer{% endif %}</button>
+</form>
+<a href="{% url 'module_list' %}">Retour à la liste</a>
