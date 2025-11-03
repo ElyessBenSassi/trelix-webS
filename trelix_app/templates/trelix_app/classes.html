@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Available Classes</title>
+  </head>
+  <body>
+    <h1>Classes in Dataset</h1>
+    <ul>
+      {% for uri in class_uris %}
+      <li>{{ uri }}</li>
+      {% empty %}
+      <li>No classes found.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

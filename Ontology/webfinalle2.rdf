@@ -1,0 +1,562 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15/"
+     xml:base="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15">
+        <owl:imports rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Ajoute -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Ajoute">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Enseignant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#CompteRendu"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#DEPOSE -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#DEPOSE">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#CompteRendu"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Organise -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Organise">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Enseignant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#HackathonEvent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#WorkshopEvent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#achete -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#achete">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Pack"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#associer -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#associer">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Achievement"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Certificat"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#badges"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#choisie -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#choisie">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Support"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#enseigne -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#enseigne">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Enseignant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#course"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#obtien -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#obtien">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Certificat"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#badges"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#participer -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#participer">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#HackathonEvent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#WorkshopEvent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#passe -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#passe">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Examens"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Quizz"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#soumettre -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#soumettre">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#QCM_Leaderboard"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_achievement -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_achievement">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Achievement"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_activity -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_activity">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Activités"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_badge -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_badge">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#badges"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_certificat -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#description_certificat">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Certificat"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#duréé_activity -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#duréé_activity">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Activités"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#email -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#email">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#niveaux_etudiant -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#niveaux_etudiant">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#nom -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#nom">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#nom_participant -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#nom_participant">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#password -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#password">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#prenom -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#prenom">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#prenom_participant -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#prenom_participant">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#specialité_enseignant -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#specialité_enseignant">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Enseignant"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_achievement -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_achievement">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Achievement"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_activity -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_activity">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Activités"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_badge -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_badge">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#badges"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_certificat -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#title_certificat">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Certificat"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Certificat -->
+
+    <rdf:Description rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Certificat">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Achievement"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Enseignant -->
+
+    <rdf:Description rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Enseignant">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Personne"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant -->
+
+    <rdf:Description rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Etudiant">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Personne"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Achievement -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Achievement"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Activités -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Activités"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#CompteRendu -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#CompteRendu">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Activités"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Evaluation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Evaluation"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Evenement -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Evenement"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Goal -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Goal"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#GoalActivity -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#GoalActivity">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Goal"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#HackathonEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#HackathonEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Evenement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Leaderboard -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Leaderboard"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Pack -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Pack">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Produit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Personne -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Personne"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Preferences -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Preferences"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Produit -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Produit"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#QCM_Leaderboard -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#QCM_Leaderboard">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Leaderboard"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Support -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Support">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Preferences"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#WorkshopEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#WorkshopEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Evenement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#badges -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#badges">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Achievement"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Exercie_python -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Exercie_python">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#CompteRendu"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Laravel -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Laravel">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#course"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Notion_GitHub -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Notion_GitHub">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#WorkshopEvent"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Pack_VIP -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Pack_VIP">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Pack"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Trelix_extrime -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Trelix_extrime">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#HackathonEvent"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#compléte_3_chapitres -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#compléte_3_chapitres">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#GoalActivity"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#devops_fondamentale -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#devops_fondamentale">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Quizz"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#eya_nehdi -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#eya_nehdi">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-12#Enseignant"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#pdf -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#pdf">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Support"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#vidéo -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#vidéo">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#Support"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
+
