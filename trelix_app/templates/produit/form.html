@@ -1,0 +1,12 @@
+<h1>{% if produit %}Modifier{% else %}Créer{% endif %} Produit</h1>
+<form method="post">
+    {% csrf_token %}
+    <label>Nom Pack:</label>
+    <input type="text" name="nomPack" value="{{ produit.nomPack|default:'' }}" required><br>
+    <label>Description:</label>
+    <input type="text" name="description" value="{{ produit.description|default:'' }}" required><br>
+    <label>Valeur Monétaire:</label>
+    <input type="number" step="0.01" name="valeurMonetaire" value="{{ produit.valeurMonetaire|default:'' }}" required><br>
+    <button type="submit">{% if produit %}Modifier{% else %}Créer{% endif %}</button>
+</form>
+<a href="{% url 'produit_list' %}">Retour à la liste</a>

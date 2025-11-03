@@ -1,0 +1,18 @@
+<h1>Liste des Produits</h1>
+<a href="{% url 'produit_create' %}">Créer un produit</a>
+<table border="1">
+<tr>
+<th>Nom Pack</th><th>Description</th><th>Valeur</th><th>Actions</th>
+</tr>
+{% for p in produits %}
+<tr>
+<td>{{ p.nomPack }}</td>
+<td>{{ p.description }}</td>
+<td>{{ p.valeurMonetaire }}</td>
+<td>
+    <a href="{% url 'produit_update' %}?uri={{ p.uri }}">Edit</a> |
+    <a href="{% url 'produit_delete' %}?uri={{ p.uri }}">Delete</a>
+</td>
+</tr>
+{% endfor %}
+</table>
