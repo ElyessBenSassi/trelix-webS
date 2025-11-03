@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{% if preference %}Modifier{% else %}Créer{% endif %} une Préférence</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f6f8fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fafafa;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    select:focus {
+      border-color: #4f46e5;
+      outline: none;
+      background-color: #fff;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4f46e5;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>{% if preference %}Modifier{% else %}Créer{% endif %} une Préférence</h1>
+
+    <form method="POST">
+      {% csrf_token %}
+      
+      <label>Langue :</label>
+      <select name="langue" required>
+        <option value="Français" {% if preference.langue == 'Français' %}selected{% endif %}>Français</option>
+        <option value="Anglais" {% if preference.langue == 'Anglais' %}selected{% endif %}>Anglais</option>
+      </select>
+
+      <label>Format du cours :</label>
+      <select name="formatCours" required>
+        <option value="PDF" {% if preference.formatCours == 'PDF' %}selected{% endif %}>PDF</option>
+        <option value="Vidéo" {% if preference.formatCours == 'Vidéo' %}selected{% endif %}>Vidéo</option>
+        <option value="Quiz" {% if preference.formatCours == 'Quiz' %}selected{% endif %}>Quiz</option>
+        <option value="Interactif" {% if preference.formatCours == 'Interactif' %}selected{% endif %}>Interactif</option>
+      </select>
+
+      <label>Période d'étude :</label>
+      <select name="periode">
+        <option value="Jour" {% if preference.periode == 'Jour' %}selected{% endif %}>Jour</option>
+        <option value="Nuit" {% if preference.periode == 'Nuit' %}selected{% endif %}>Nuit</option>
+      </select>
+
+      <label>Étudier pendant les vacances :</label>
+      <select name="vacances">
+        <option value="Oui" {% if preference.vacances == 'Oui' %}selected{% endif %}>Oui</option>
+        <option value="Non" {% if preference.vacances == 'Non' %}selected{% endif %}>Non</option>
+      </select>
+
+      <label>Mode d'étude :</label>
+      <select name="modeEtude">
+        <option value="Individuel" {% if preference.modeEtude == 'Individuel' %}selected{% endif %}>Individuel</option>
+        <option value="Groupe" {% if preference.modeEtude == 'Groupe' %}selected{% endif %}>Groupe</option>
+      </select>
+
+      <button type="submit">💾 Enregistrer</button>
+    </form>
+  </div>
+</body>
+</html>

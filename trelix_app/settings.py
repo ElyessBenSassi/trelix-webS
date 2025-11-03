@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'trelix_app',
     'module',
     'produit',
+    'evenement',
+    'preference',
 ]
 
 MIDDLEWARE = [

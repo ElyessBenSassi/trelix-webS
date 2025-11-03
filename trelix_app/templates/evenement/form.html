@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if evenement %}Modifier{% else %}Créer{% endif %} un événement</title>
+    <style>
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            background: #f5f7fb;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 2rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 420px;
+            transition: 0.3s ease;
+        }
+
+        .form-container:hover {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            text-align: center;
+            color: #3b4cca;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fafafa;
+            transition: 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #3b4cca;
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 76, 202, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(90deg, #3b4cca, #6574f7);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #2e3bbd, #5464e9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(59, 76, 202, 0.3);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #3b4cca;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #2e3bbd;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>{% if evenement %}Modifier{% else %}Créer{% endif %} un événement</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+            <label>Nom :</label>
+            <input name="nomEvenement" value="{{ evenement.nomEvenement|default:'' }}" placeholder="Ex: Salon de l’innovation">
+
+            <label>Date :</label>
+            <input name="dateEvenement" type="date" value="{{ evenement.dateEvenement|default:'' }}">
+
+            <label>Description :</label>
+            <textarea name="description" placeholder="Ajoutez une courte description...">{{ evenement.description|default:'' }}</textarea>
+
+            <label>Lieu :</label>
+            <input name="lieu" value="{{ evenement.lieu|default:'' }}" placeholder="Ex: Tunis, Palais des Congrès">
+
+            <button type="submit">💾 Enregistrer</button>
+        </form>
+
+<a href="{% url 'evenement:evenement_list' %}">Retour</a>
+    </div>
+</body>
+</html>
