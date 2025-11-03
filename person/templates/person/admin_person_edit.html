@@ -1,0 +1,106 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Edit Person - Admin{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+<section class="blog-page-2 sec-padding">
+    <div class="container">
+       <div class="row">
+          <div class="col-lg-8 mx-auto">
+             <div class="card shadow-1 rounded-3 border">
+                <div class="card-header bg-primary text-white">
+                   <div class="d-flex justify-content-between align-items-center">
+                      <h2 class="display-5 mb-0">
+                         <i class="feather-icon icon-edit"></i> Edit Person
+                      </h2>
+                      <a href="{% url 'person:admin_persons' %}" class="btn btn-light btn-sm">
+                         <i class="feather-icon icon-arrow-left"></i> Back to List
+                      </a>
+                   </div>
+                </div>
+                <div class="card-body p-4">
+                   {% if messages %}
+                      <div class="mb-4">
+                         {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                               {{ message }}
+                               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                         {% endfor %}
+                      </div>
+                   {% endif %}
+                   
+                   <form method="post" action="{% url 'person:admin_person_edit' person.uri %}">
+                      {% csrf_token %}
+                      
+                      <div class="mb-3">
+                         <label for="name" class="form-label">
+                            <strong>Name <span class="text-danger">*</span></strong>
+                         </label>
+                         <input type="text" class="form-control form-control-lg" id="name" name="name" 
+                                value="{{ person.name }}" placeholder="Enter person name" required>
+                      </div>
+                      
+                      <div class="mb-3">
+                         <label for="email" class="form-label">
+                            <strong>Email <span class="text-danger">*</span></strong>
+                         </label>
+                         <input type="email" class="form-control form-control-lg" id="email" name="email" 
+                                value="{{ person.email }}" placeholder="Enter email address" required>
+                      </div>
+                      
+                      <div class="mb-3">
+                         <label for="age" class="form-label">
+                            <strong>Age</strong>
+                         </label>
+                         <input type="number" class="form-control" id="age" name="age" 
+                                value="{{ person.age }}" placeholder="Enter age" min="1" max="120">
+                      </div>
+                      
+                      {% if is_administrator %}
+                      {# Hide role field for Administrators - role will be preserved automatically #}
+                      <input type="hidden" name="preserve_role" value="true">
+                      {% else %}
+                      <div class="mb-3">
+                         <label for="role" class="form-label">
+                            <strong>Role</strong>
+                         </label>
+                         <select name="role" class="form-control form-control-lg" id="role-select">
+                            <option value="">No Role</option>
+                            {% if available_roles %}
+                               {% for role in available_roles %}
+                                  <option value="{{ role.uri }}" {% if person.role_uri == role.uri or person.role == role.uri %}selected{% endif %}>
+                                     {{ role.label }}
+                                  </option>
+                               {% endfor %}
+                            {% endif %}
+                         </select>
+                      </div>
+                      {% endif %}
+                      
+                      <div class="alert alert-info">
+                         <i class="feather-icon icon-info"></i> 
+                         <strong>Note:</strong> Person URI: <code>{{ person.uri|truncatewords:5 }}</code>
+                         {% if is_administrator %}
+                         <br><i class="feather-icon icon-shield"></i> <strong>Administrator Role:</strong> The role field is hidden and will be preserved automatically.
+                         {% endif %}
+                      </div>
+                      
+                      <div class="d-flex justify-content-between align-items-center mt-4">
+                         <a href="{% url 'person:admin_persons' %}" class="btn btn-secondary">
+                            <i class="feather-icon icon-arrow-left"></i> Cancel
+                         </a>
+                         <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="feather-icon icon-save"></i> Update Person
+                         </button>
+                      </div>
+                   </form>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+</section>
+{% include 'trelix_app/footer.html' %}
+{% endblock %}
+

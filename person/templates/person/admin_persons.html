@@ -1,0 +1,127 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Admin - All Persons{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+{% include 'trelix_app/delete_confirm_modal.html' %}
+<section class="blog-page-2 sec-padding">
+    <div class="container">
+       <div class="row">
+          <div class="col-12">
+             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="display-5">
+                   <i class="feather-icon icon-users"></i> All Persons
+                </h2>
+                <div class="text-muted">
+                   <i class="feather-icon icon-info"></i> Total: {{ total_count }} persons
+                </div>
+             </div>
+             {% if messages %}
+                <div class="mb-4">
+                   {% for message in messages %}
+                      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                         {{ message }}
+                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                   {% endfor %}
+                </div>
+             {% endif %}
+             
+             {% if persons %}
+                <div class="card shadow-1 rounded-3 border">
+                   <div class="card-body p-0">
+                      <div class="table-responsive">
+                         <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                               <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Name</th>
+                                  <th scope="col">Email</th>
+                                  <th scope="col">Age</th>
+                                  <th scope="col">Role</th>
+                                  <th scope="col">URI</th>
+                                  <th scope="col">Actions</th>
+                               </tr>
+                            </thead>
+                            <tbody>
+                               {% for person in persons %}
+                                  <tr>
+                                     <td>{{ forloop.counter }}</td>
+                                     <td>
+                                        <strong>{{ person.name|default:"N/A" }}</strong>
+                                     </td>
+                                     <td>
+                                        <a href="mailto:{{ person.email }}" class="text-decoration-none">
+                                           {{ person.email|default:"N/A" }}
+                                        </a>
+                                     </td>
+                                     <td>
+                                        {% if person.age %}
+                                           {{ person.age }}
+                                        {% else %}
+                                           <span class="text-muted">-</span>
+                                        {% endif %}
+                                     </td>
+                                     <td>
+                                        {% if person.role_label %}
+                                           <span class="badge bg-primary">{{ person.role_label }}</span>
+                                        {% elif person.role_uri %}
+                                           <span class="badge bg-secondary">{{ person.role_uri|truncatewords:1 }}</span>
+                                        {% else %}
+                                           <span class="text-muted">No role</span>
+                                        {% endif %}
+                                     </td>
+                                     <td>
+                                        <small class="text-muted font-monospace" style="font-size: 0.75rem;">
+                                           {{ person.uri|truncatewords:3 }}
+                                        </small>
+                                     </td>
+                                     <td>
+                                        <div class="btn-group" role="group">
+                                           <a href="{% url 'person:admin_person_edit' person.uri %}" 
+                                              class="btn btn-sm btn-primary" 
+                                              title="Edit">
+                                              <i class="feather-icon icon-edit"></i> Edit
+                                           </a>
+                                           {% if person.uri != request.user.uri %}
+                                           <button type="button"
+                                              class="btn btn-sm btn-danger" 
+                                              title="Delete"
+                                              data-delete-action
+                                              data-delete-url="{% url 'person:admin_person_delete' person.uri %}"
+                                              data-item-type="person"
+                                              data-item-name="{{ person.name }}"
+                                              data-warning="You are about to delete this person from the dataset. This action cannot be undone."
+                                              data-item-details="<h6 class=&quot;mb-3&quot;>Person Details:</h6><table class=&quot;table table-bordered table-sm&quot;><tr><th>Name:</th><td><strong>{% if person.name %}{{ person.name }}{% else %}N/A{% endif %}</strong></td></tr><tr><th>Email:</th><td>{% if person.email %}{{ person.email }}{% else %}N/A{% endif %}</td></tr><tr><th>Age:</th><td>{% if person.age %}{{ person.age }}{% else %}N/A{% endif %}</td></tr><tr><th>Role:</th><td>{% if person.role_label %}<span class=&quot;badge bg-primary&quot;>{{ person.role_label }}</span>{% else %}<span class=&quot;text-muted&quot;>No role</span>{% endif %}</td></tr></table>">
+                                              <i class="feather-icon icon-trash-2"></i> Delete
+                                           </button>
+                                           {% else %}
+                                           <button type="button"
+                                              class="btn btn-sm btn-secondary" 
+                                              title="Cannot delete yourself"
+                                              disabled>
+                                              <i class="feather-icon icon-lock"></i> Delete
+                                           </button>
+                                           {% endif %}
+                                        </div>
+                                     </td>
+                                  </tr>
+                               {% endfor %}
+                            </tbody>
+                         </table>
+                      </div>
+                   </div>
+                </div>
+             {% else %}
+                <div class="alert alert-info text-center">
+                   <h4>No persons found</h4>
+                   <p>The dataset is currently empty.</p>
+                </div>
+             {% endif %}
+          </div>
+       </div>
+    </div>
+</section>
+{% include 'trelix_app/footer.html' %}
+{% endblock %}
+

@@ -154,25 +154,32 @@
                       <i class="feather-icon icon-user"></i><span>My Profile</span>
                     </a>
                   </li>
+                  {% if request.user.is_authenticated and request.user.is_admin %}
+                  <li>
+                    <a class="nav-link" href="{% url 'person:admin_persons' %}">
+                      <i class="feather-icon icon-users"></i><span>All Persons</span>
+                    </a>
+                  </li>
+                  {% endif %}
                     <li>
                     <a class="nav-link" href="#">
                       <i class="feather-icon icon-video"></i><span>create meeting</span>
                     </a>
                   </li>
                   <li>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'person:sign_out' %}">
                       <i class="feather-icon icon-log-out"></i><span>Logout</span>
                     </a>
                   </li>
                 
                 {% else %}
                   <li>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'person:sign_in' %}">
                       <i class="feather-icon icon-log-in"></i><span>Sign In</span>
                     </a>
                   </li>
                   <li>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'person:sign_up' %}">
                       <i class="feather-icon icon-user-plus"></i><span>Sign Up</span>
                     </a>
                   </li>
@@ -198,7 +205,7 @@
               <li class="nav-item"><a class="nav-link" href="#">Exams</a></li>
               <li class="nav-item"><a class="nav-link" href="#">Evenement</a></li>
               <li class="nav-item"><a class="nav-link" href="#">Quiz</a></li>
-             <li class="nav-item"><a class="nav-link" href="#">Badges</a>
+             <li class="nav-item"><a class="nav-link" href="{% url 'activity:activity_list' %}">Activities</a>
 </li>
 
                
