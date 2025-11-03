@@ -1,0 +1,48 @@
+#options-wrapper {
+    background: #f7f7f7;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.option-input {
+    flex: 1;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.remove-option-btn {
+    background: #ff4d4d;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-left: 8px;
+    cursor: pointer;
+    padding: 2px 8px;
+}
+
+.add-option-btn {
+    background: #4CAF50;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-option-btn:hover {
+    background: #45a049;
+}
+
+.remove-option-btn:hover {
+    background: #d93636;
+}

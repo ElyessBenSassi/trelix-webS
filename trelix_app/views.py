@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from SPARQLWrapper import SPARQLWrapper, JSON
+from django.shortcuts import render, redirect
 
+def home(request):
+    return render(request, 'trelix_app/index.html')
+    
 def classes_html_view(request):
     sparql = SPARQLWrapper("http://localhost:3030/trelix/sparql")
     sparql.setQuery("""
