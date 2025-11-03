@@ -1,12 +1,486 @@
-<h1>{% if produit %}Modifier{% else %}Créer{% endif %} Produit</h1>
-<form method="post">
-    {% csrf_token %}
-    <label>Nom Pack:</label>
-    <input type="text" name="nomPack" value="{{ produit.nomPack|default:'' }}" required><br>
-    <label>Description:</label>
-    <input type="text" name="description" value="{{ produit.description|default:'' }}" required><br>
-    <label>Valeur Monétaire:</label>
-    <input type="number" step="0.01" name="valeurMonetaire" value="{{ produit.valeurMonetaire|default:'' }}" required><br>
-    <button type="submit">{% if produit %}Modifier{% else %}Créer{% endif %}</button>
-</form>
-<a href="{% url 'produit_list' %}">Retour à la liste</a>
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}{% if produit %}Modifier{% else %}Créer{% endif %} Produit{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+
+<!-- Enhanced Promo Section -->
+{% get_static_prefix as STATIC_PREFIX %}
+<section class="promo-sec position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%), url('{{ STATIC_PREFIX }}images/promo-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding: 60px 0;">
+  <img src="{% static 'images/promo-left.png' %}" alt="" class="anim-img" style="opacity: 0.6;">
+  <img src="{% static 'images/promo-right.png' %}" alt="" class="anim-img anim-right" style="opacity: 0.6;">
+  <div class="container position-relative" style="z-index: 10;">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="display-4 text-white fw-bold mb-3" style="text-shadow: 0 2px 20px rgba(0,0,0,0.2);">
+          {% if produit %}
+            <i class="feather-icon icon-edit-3 me-3"></i>Modifier le Produit
+          {% else %}
+            <i class="feather-icon icon-plus-circle me-3"></i>Créer un Produit
+          {% endif %}
+        </h1>
+        <p class="text-white-50 fs-5 mb-4">
+          {% if produit %}
+            Mettez à jour les informations de votre produit
+          {% else %}
+            Ajoutez un nouveau produit à votre catalogue
+          {% endif %}
+        </p>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-center" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 50px; padding: 12px 24px; display: inline-flex;">
+            <li class="breadcrumb-item"><a href="/" class="text-white text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'produit_list' %}" class="text-white text-decoration-none">Produits</a></li>
+            <li class="breadcrumb-item text-white-50" aria-current="page">{% if produit %}Modifier{% else %}Créer{% endif %}</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Form Section -->
+<section class="py-5" style="background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%); min-height: calc(100vh - 400px);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+        <!-- Progress Indicator -->
+        <div class="mb-4 text-center">
+          <div class="d-inline-flex align-items-center gap-3 p-3 bg-white rounded-pill shadow-sm">
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                <i class="feather-icon icon-check text-white" style="font-size: 14px;"></i>
+              </div>
+              <span class="fw-semibold" style="color: #6366f1;">Informations</span>
+            </div>
+            <i class="feather-icon icon-chevron-right text-muted"></i>
+            <div class="d-flex align-items-center gap-2 opacity-50">
+              <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: #e2e8f0;">
+                <i class="feather-icon icon-save text-muted" style="font-size: 14px;"></i>
+              </div>
+              <span class="text-muted">Sauvegarde</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="card border-0 shadow-lg position-relative overflow-hidden" style="border-radius: 20px;">
+          <!-- Decorative gradient bar -->
+          <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);"></div>
+          
+          <div class="card-body p-5">
+            <form method="post" id="produitForm">
+              {% csrf_token %}
+              
+              <!-- Form Header -->
+              <div class="text-center mb-5">
+                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 20px; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);">
+                  <i class="feather-icon icon-package text-white" style="font-size: 2rem;"></i>
+                </div>
+                <h3 class="fw-bold mb-2" style="color: #1e293b;">Détails du Produit</h3>
+                <p class="text-muted mb-0">Remplissez les informations ci-dessous</p>
+              </div>
+
+              <!-- Nom du Pack -->
+              <div class="mb-4">
+                <label for="nomPack" class="form-label fw-semibold d-flex align-items-center gap-2" style="color: #1e293b;">
+                  <i class="feather-icon icon-shopping-bag" style="font-size: 1rem; color: #6366f1;"></i>
+                  Nom du Pack
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;">
+                    <i class="feather-icon icon-tag text-muted"></i>
+                  </span>
+                  <input type="text" 
+                         class="form-control border-start-0 ps-0 form-input" 
+                         id="nomPack" 
+                         name="nomPack" 
+                         value="{{ produit.nomPack|default:'' }}" 
+                         placeholder="Ex: Pack Premium" 
+                         required
+                         style="border-radius: 0 12px 12px 0; border-left: none;">
+                </div>
+                <small class="text-muted ms-2">
+                  <i class="feather-icon icon-info" style="font-size: 0.875rem;"></i>
+                  Donnez un nom attractif et mémorable à votre produit
+                </small>
+              </div>
+
+              <!-- Description -->
+              <div class="mb-4">
+                <label for="description" class="form-label fw-semibold d-flex align-items-center gap-2" style="color: #1e293b;">
+                  <i class="feather-icon icon-file-text" style="font-size: 1rem; color: #6366f1;"></i>
+                  Description
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="position-relative">
+                  <textarea class="form-control form-input" 
+                            id="description" 
+                            name="description" 
+                            rows="6" 
+                            placeholder="Décrivez votre produit en détail : caractéristiques, avantages, ce qui le rend unique..."
+                            required
+                            style="border-radius: 12px; padding: 20px; resize: vertical; min-height: 150px;">{{ produit.description|default:'' }}</textarea>
+                  <div class="position-absolute bottom-0 end-0 p-3">
+                    <small class="text-muted" id="charCount">0 caractères</small>
+                  </div>
+                </div>
+                <small class="text-muted ms-2">
+                  <i class="feather-icon icon-info" style="font-size: 0.875rem;"></i>
+                  Une description claire aide vos clients à comprendre la valeur du produit
+                </small>
+              </div>
+
+              <!-- Valeur Monétaire -->
+              <div class="mb-4">
+                <label for="valeurMonetaire" class="form-label fw-semibold d-flex align-items-center gap-2" style="color: #1e293b;">
+                  <i class="feather-icon icon-dollar-sign" style="font-size: 1rem; color: #10b981;"></i>
+                  Valeur Monétaire
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text border-end-0" style="border-radius: 12px 0 0 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-color: #10b981;">
+                    <i class="feather-icon icon-euro-sign"></i>
+                  </span>
+                  <input type="number" 
+                         step="0.01" 
+                         min="0"
+                         class="form-control border-start-0 ps-2 form-input price-input" 
+                         id="valeurMonetaire" 
+                         name="valeurMonetaire" 
+                         value="{{ produit.valeurMonetaire|default:'' }}" 
+                         placeholder="0.00"
+                         required
+                         style="border-radius: 0 12px 12px 0; border-left: none; font-size: 1.5rem; font-weight: 600; color: #10b981;">
+                  <span class="input-group-text bg-light border-start-0" style="border-radius: 0 12px 12px 0;">
+                    <span class="text-muted">EUR</span>
+                  </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                  <small class="text-muted ms-2">
+                    <i class="feather-icon icon-info" style="font-size: 0.875rem;"></i>
+                    Prix en euros (€)
+                  </small>
+                  <span id="pricePreview" class="badge px-3 py-2" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; font-size: 0.9rem;">
+                    0,00 €
+                  </span>
+                </div>
+              </div>
+
+              <!-- Divider -->
+              <hr class="my-5" style="border-top: 2px dashed #e2e8f0;">
+
+              <!-- Action Buttons -->
+              <div class="d-flex gap-3 justify-content-between align-items-center">
+                <a href="{% url 'produit_list' %}" class="btn btn-lg btn-light d-flex align-items-center gap-2 px-4" style="border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 500; transition: all 0.3s ease;">
+                  <i class="feather-icon icon-arrow-left"></i>
+                  <span>Retour</span>
+                </a>
+                
+                <div class="d-flex gap-3">
+                  <button type="button" class="btn btn-lg btn-outline-secondary d-flex align-items-center gap-2 px-4" id="previewBtn" style="border-radius: 12px; font-weight: 500; transition: all 0.3s ease;">
+                    <i class="feather-icon icon-eye"></i>
+                    <span>Aperçu</span>
+                  </button>
+                  
+                  <button type="submit" class="btn btn-lg d-flex align-items-center gap-2 px-5" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 500; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transition: all 0.3s ease;">
+                    <i class="feather-icon icon-save"></i>
+                    <span>{% if produit %}Mettre à jour{% else %}Créer le produit{% endif %}</span>
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+        <!-- Tips Card -->
+        <div class="card border-0 shadow-sm mt-4" style="border-radius: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3 d-flex align-items-center gap-2" style="color: #166534;">
+              <i class="feather-icon icon-lightbulb"></i>
+              Conseils pour créer un produit attractif
+            </h6>
+            <ul class="mb-0 ps-4" style="color: #14532d; line-height: 1.8;">
+              <li>Choisissez un nom court, mémorable et évocateur</li>
+              <li>Décrivez clairement les bénéfices et caractéristiques</li>
+              <li>Définissez un prix compétitif et juste</li>
+              <li>Utilisez un langage positif et orienté client</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      <div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 30px 30px 80px 30px; position: relative;">
+        <div>
+          <h5 class="modal-title text-white fw-bold fs-3 mb-2" id="previewModalLabel">
+            <i class="feather-icon icon-eye me-2"></i>Aperçu du Produit
+          </h5>
+          <p class="text-white-50 mb-0 fs-6">Vérifiez les informations avant de sauvegarder</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        
+      </div>
+      <div class="modal-body p-4" style="background: #f8f9fa;">
+        <div id="previewContent" class="bg-white p-4 rounded-3">
+          <!-- Preview content will be inserted here -->
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-white p-4">
+        <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal" style="border-radius: 12px;">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'trelix_app/footer.html' %}
+
+<style>
+/* Form Input Styling */
+.form-input {
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    outline: none;
+}
+
+.price-input:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+}
+
+.input-group-text {
+    border: 2px solid #e2e8f0;
+    border-right: none;
+}
+
+.form-input:focus + .input-group-text,
+.input-group:focus-within .input-group-text {
+    border-color: #6366f1;
+}
+
+.price-input:focus ~ .input-group-text {
+    border-color: #10b981 !important;
+}
+
+/* Button Hover Effects */
+.btn-light:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Card Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* Character Count */
+#charCount {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+/* Price Input Special Styling */
+.price-input {
+    font-family: 'Courier New', monospace;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .promo-sec {
+        padding: 40px 0 !important;
+    }
+    
+    .display-4 {
+        font-size: 2rem !important;
+    }
+    
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .d-flex.gap-3.justify-content-between {
+        flex-direction: column;
+    }
+    
+    .d-flex.gap-3.justify-content-between > div {
+        width: 100%;
+    }
+    
+    .d-flex.gap-3.justify-content-between button,
+    .d-flex.gap-3.justify-content-between a {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const descriptionField = document.getElementById('description');
+    const charCount = document.getElementById('charCount');
+    const priceField = document.getElementById('valeurMonetaire');
+    const pricePreview = document.getElementById('pricePreview');
+    const costPriceField = document.getElementById('costPrice');
+    const marginDisplay = document.getElementById('marginDisplay');
+    const previewBtn = document.getElementById('previewBtn');
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    const previewContent = document.getElementById('previewContent');
+    const produitForm = document.getElementById('produitForm');
+
+    // Character counter
+    function updateCharCount() {
+        const count = descriptionField.value.length;
+        charCount.textContent = `${count} caractère${count > 1 ? 's' : ''}`;
+    }
+
+    descriptionField.addEventListener('input', updateCharCount);
+    updateCharCount(); // Initial count
+
+    // Price preview
+    function updatePricePreview() {
+        const price = parseFloat(priceField.value) || 0;
+        pricePreview.textContent = price.toLocaleString('fr-FR', {
+            style: 'currency',
+            currency: 'EUR'
+        });
+    }
+
+    priceField.addEventListener('input', updatePricePreview);
+    updatePricePreview(); // Initial price
+
+    // Margin calculator
+    function updateMargin() {
+        const sellPrice = parseFloat(priceField.value) || 0;
+        const costPrice = parseFloat(costPriceField.value) || 0;
+        const margin = sellPrice - costPrice;
+        
+        marginDisplay.textContent = margin.toLocaleString('fr-FR', {
+            style: 'currency',
+            currency: 'EUR'
+        });
+        
+        if (margin < 0) {
+            marginDisplay.style.color = '#ef4444';
+        } else if (margin > 0) {
+            marginDisplay.style.color = '#10b981';
+        } else {
+            marginDisplay.style.color = '#64748b';
+        }
+    }
+
+    priceField.addEventListener('input', updateMargin);
+    costPriceField.addEventListener('input', updateMargin);
+
+    // Preview functionality
+    previewBtn.addEventListener('click', () => {
+        const nomPack = document.getElementById('nomPack').value;
+        const description = document.getElementById('description').value;
+        const valeur = parseFloat(priceField.value) || 0;
+
+        if (!nomPack || !description || !valeur) {
+            alert('Veuillez remplir tous les champs avant de prévisualiser');
+            return;
+        }
+
+        previewContent.innerHTML = `
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 12px;">
+                    <i class="feather-icon icon-package text-white" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="feather-icon icon-shopping-bag" style="color: #6366f1;"></i>
+                    <span class="text-muted small fw-semibold">NOM DU PACK</span>
+                </div>
+                <h4 class="fw-bold mb-0" style="color: #1e293b;">${nomPack}</h4>
+            </div>
+            
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="feather-icon icon-file-text" style="color: #6366f1;"></i>
+                    <span class="text-muted small fw-semibold">DESCRIPTION</span>
+                </div>
+                <div class="p-3 rounded-3" style="background: #f8f9fa; white-space: pre-wrap; line-height: 1.8; color: #475569;">
+                    ${description}
+                </div>
+            </div>
+            
+            <div class="text-center p-4 rounded-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <span class="text-white-50 small d-block mb-2">PRIX</span>
+                <h2 class="text-white fw-bold mb-0">${valeur.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</h2>
+            </div>
+        `;
+
+        previewModal.show();
+    });
+
+    // Form submission animation
+    produitForm.addEventListener('submit', (e) => {
+        const submitBtn = produitForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enregistrement...';
+    });
+
+    // Auto-resize textarea
+    descriptionField.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.max(150, this.scrollHeight) + 'px';
+    });
+
+    // Format price input on blur
+    priceField.addEventListener('blur', function() {
+        const value = parseFloat(this.value) || 0;
+        this.value = value.toFixed(2);
+        updatePricePreview();
+        updateMargin();
+    });
+});
+</script>
+{% endblock %}

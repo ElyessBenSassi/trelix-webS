@@ -19,7 +19,7 @@ from django.urls import path, include
 from .views import classes_html_view
 
 urlpatterns = [
-       path('', views.home, name='home'),
+    #    path('', views.home, name='home'),
        path('classes/', classes_html_view),
        path("modules/", include("module.urls")),
        path("produit/", include("produit.urls")),
