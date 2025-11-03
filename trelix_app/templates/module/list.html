@@ -1,23 +1,648 @@
-<h1>Liste des Modules</h1>
-<a href="{% url 'module_create' %}">Créer un nouveau module</a>
-<table border="1">
-<tr>
-    <th>URI</th>
-    <th>Nom Module</th>
-    <th>Nom Cours</th>
-    <th>Contenu</th>
-    <th>Actions</th>
-</tr>
-{% for m in modules %}
-<tr>
-    <td>{{ m.uri }}</td>
-    <td>{{ m.nomModule }}</td>
-    <td>{{ m.NomCours }}</td>
-    <td>{{ m.Contenu }}</td>
-    <td>
-        <a href="{% url 'module_update' %}?uri={{ m.uri|urlencode }}">Edit</a> |
-        <a href="{% url 'module_delete' %}?uri={{ m.uri|urlencode }}">Delete</a>
-    </td>
-</tr>
-{% endfor %}
-</table>
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Modules{% endblock %}
+
+{% block content %}
+{% include 'trelix_app/header.html' %}
+
+<!-- Enhanced Promo Section -->
+{% get_static_prefix as STATIC_PREFIX %}
+<section class="promo-sec position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%), url('{{ STATIC_PREFIX }}images/promo-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding: 80px 0;">
+  <img src="{% static 'images/promo-left.png' %}" alt="" class="anim-img" style="opacity: 0.6;">
+  <img src="{% static 'images/promo-right.png' %}" alt="" class="anim-img anim-right" style="opacity: 0.6;">
+  <div class="container position-relative" style="z-index: 10;">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="display-2 text-white fw-bold mb-3" style="text-shadow: 0 2px 20px rgba(0,0,0,0.2);">Modules</h1>
+        <p class="text-white-50 fs-5 mb-4">Explorez et gérez vos modules d'apprentissage</p>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-center" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 50px; padding: 12px 24px; display: inline-flex;">
+            <li class="breadcrumb-item"><a href="/" class="text-white text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item text-white-50" aria-current="page">Modules</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced Modules Section -->
+<section class="modules-sec sec-padding" style="background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%); padding: 60px 0;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <!-- Search and Filter Bar -->
+        <div class="mb-5 p-4 bg-white rounded-3 shadow-sm">
+          <div class="row align-items-center g-3">
+            <div class="col-lg-6 col-md-12">
+              <div class="input-group input-group-lg">
+                <span class="input-group-text bg-transparent border-end-0">
+                  <i class="feather-icon icon-search"></i>
+                </span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Rechercher des modules..." id="moduleSearch" style="box-shadow: none;">
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+              <div class="d-flex align-items-center justify-content-lg-end gap-3">
+                <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                  <i class="feather-icon icon-book-open me-2"></i>
+                  <span id="moduleCount">{{ modules|length }}</span> Modules
+                </span>
+                <a href="{% url 'module_create' %}" class="btn btn-lg px-4" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
+                  <i class="feather-icon icon-plus-circle me-2"></i>
+                  <span>Ajouter Module</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="modules-container" class="module-lists row g-4">
+          {% for module in modules %}
+          <div class="col-xl-6 col-lg-6 col-md-12 module-item" data-module-name="{{ module.nomModule|lower }}" data-course-name="{{ module.NomCours|lower }}">
+            <div class="module-entry-3 card h-100 border-0 shadow-sm position-relative overflow-hidden" style="transition: all 0.3s ease; border-radius: 16px;">
+              <!-- Decorative gradient bar -->
+              <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);"></div>
+              
+              <div class="card-body p-4 d-flex flex-column">
+                <!-- Module Header -->
+                <div class="mb-3">
+                  <h3 class="sub-title mb-2 fw-bold" style="color: #1e293b; font-size: 1.25rem; line-height: 1.4;">{{ module.nomModule }}</h3>
+                  <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">{{ module.Contenu|truncatewords:20 }}</p>
+                </div>
+
+                <!-- Module Footer -->
+                <div class="module-footer mt-auto pt-3" style="border-top: 1px solid #f1f5f9;">
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); font-size: 0.85rem; border-radius: 8px;">
+                      <i class="feather-icon icon-book me-1"></i>{{ module.NomCours }}
+                    </span>
+                  </div>
+                  
+                  <div class="d-flex gap-2 mb-2">
+                    <a href="{% url 'module_update' %}?uri={{ module.uri }}" class="btn btn-outline-primary btn-sm flex-grow-1 d-flex align-items-center justify-content-center gap-1" style="border-radius: 10px; padding: 10px; font-weight: 500; transition: all 0.2s ease;">
+                      <i class="feather-icon icon-edit"></i>
+                      <span>Modifier</span>
+                    </a>
+                    <button class="btn btn-sm flex-grow-1 generate-quiz-btn d-flex align-items-center justify-content-center gap-1" data-uri="{{ module.uri }}" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 10px; padding: 10px; font-weight: 500; transition: all 0.2s ease;">
+                      <i class="feather-icon icon-zap"></i>
+                      <span class="btn-text">Quiz</span>
+                      <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="d-flex gap-2 mb-2">
+                    <button class="btn btn-sm flex-grow-1 summarize-module-btn d-flex align-items-center justify-content-center gap-1" data-uri="{{ module.uri }}" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 10px; padding: 10px; font-weight: 500; transition: all 0.2s ease;">
+                      <i class="feather-icon icon-file-text"></i>
+                      <span class="btn-text">Résumer</span>
+                      <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <button class="btn btn-outline-danger btn-sm w-100 delete-module-btn d-flex align-items-center justify-content-center gap-2" data-uri="{{ module.uri }}" data-module-name="{{ module.nomModule }}" style="border-radius: 10px; padding: 10px; font-weight: 500; transition: all 0.2s ease;">
+                    <i class="feather-icon icon-trash-2"></i>
+                    <span>Supprimer</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hover effect overlay -->
+              <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary" style="opacity: 0; transition: opacity 0.3s ease; pointer-events: none; mix-blend-mode: soft-light;"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="text-center py-5 d-none">
+          <div class="mb-4">
+            <i class="feather-icon icon-inbox" style="font-size: 4rem; color: #cbd5e1;"></i>
+          </div>
+          <h4 class="text-muted mb-2">Aucun module trouvé</h4>
+          <p class="text-muted">Essayez d'ajuster vos termes de recherche</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include 'trelix_app/footer.html' %}
+
+<!-- Enhanced Modal for Quiz -->
+<div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      <div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 30px 30px 80px 30px; position: relative;">
+        <div>
+          <h5 class="modal-title text-white fw-bold fs-3 mb-2" id="quizModalLabel">
+            <i class="feather-icon icon-clipboard me-2"></i>Défi Quiz
+          </h5>
+          <p class="text-white-50 mb-0 fs-6">Testez vos connaissances et suivez vos progrès</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        
+      </div>
+      <div class="modal-body p-4" style="background: #f8f9fa; max-height: 60vh;">
+        <form id="quizForm" class="p-3"></form>
+      </div>
+      <div class="modal-footer border-0 bg-white p-4" style="box-shadow: 0 -4px 20px rgba(0,0,0,0.05);">
+        <div id="quizScore" class="me-auto fw-bold fs-5" style="color: #6366f1;"></div>
+        <button type="button" class="btn btn-lg px-4" id="submitQuizBtn" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 500;">
+          <i class="feather-icon icon-check-circle me-2"></i>Soumettre les réponses
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal" style="border-radius: 12px;">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Modal -->
+<div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      <div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px 30px 80px 30px; position: relative;">
+        <div>
+          <h5 class="modal-title text-white fw-bold fs-3 mb-2" id="summaryModalLabel">
+            <i class="feather-icon icon-file-text me-2"></i>Résumé du Module
+          </h5>
+          <p class="text-white-50 mb-0 fs-6">Aperçu rapide du contenu du module</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body p-4" style="background: #f8f9fa; max-height: 60vh;">
+        <div id="summaryContent" class="p-3">
+          <div class="text-center py-4">
+            <div class="spinner-border text-warning" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-3 text-muted">Génération du résumé en cours...</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-white p-4" style="box-shadow: 0 -4px 20px rgba(0,0,0,0.05);">
+        <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal" style="border-radius: 12px;">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      <div class="modal-header border-0" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 30px;">
+        <div>
+          <h5 class="modal-title text-white fw-bold fs-4 mb-2" id="deleteModalLabel">
+            <i class="feather-icon icon-alert-triangle me-2"></i>Supprimer le Module
+          </h5>
+          <p class="text-white-50 mb-0">Cette action est irréversible</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="mb-3">Êtes-vous sûr de vouloir supprimer le module :</p>
+        <div class="alert alert-light border d-flex align-items-center" style="border-radius: 12px;">
+          <i class="feather-icon icon-book text-danger me-3 fs-4"></i>
+          <strong id="deleteModuleName" class="text-dark"></strong>
+        </div>
+        <p class="text-muted small mb-0">Toutes les données et quiz associés seront définitivement supprimés.</p>
+      </div>
+      <div class="modal-footer border-0 bg-light p-4">
+        <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal" style="border-radius: 12px;">Annuler</button>
+        <button type="button" class="btn btn-danger btn-lg px-4" id="confirmDeleteBtn" style="border-radius: 12px; font-weight: 500;">
+          <i class="feather-icon icon-trash-2 me-2"></i>Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Enhanced Card Hover Effects */
+.module-entry-3:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15) !important;
+}
+
+.module-entry-3:hover .position-absolute.bg-primary {
+    opacity: 0.02 !important;
+}
+
+/* Button Hover Effects */
+.btn-outline-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.generate-quiz-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    opacity: 0.95;
+}
+
+.summarize-module-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    opacity: 0.95;
+}
+
+.delete-module-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background-color: #fee2e2 !important;
+}
+
+.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Search Input Focus */
+#moduleSearch:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Quiz Form Styling */
+#quizForm .mb-3 {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+#quizForm .mb-3:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+#quizForm .form-check {
+    padding: 12px 16px;
+    margin: 8px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+#quizForm .form-check:hover {
+    background: #f8f9fa;
+}
+
+#quizForm .form-check-input:checked + label {
+    font-weight: 600;
+}
+
+#quizForm strong {
+    color: #1e293b;
+    font-size: 1.05rem;
+}
+
+/* Summary Content Styling */
+#summaryContent {
+    background: white;
+    border-radius: 12px;
+    line-height: 1.8;
+}
+
+#summaryContent h6 {
+    color: #1e293b;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+#summaryContent p {
+    color: #475569;
+    margin-bottom: 1rem;
+}
+
+#summaryContent ul, #summaryContent ol {
+    color: #475569;
+    padding-left: 1.5rem;
+}
+
+/* Animation for module cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+.module-item {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.module-item:nth-child(1) { animation-delay: 0.05s; }
+.module-item:nth-child(2) { animation-delay: 0.1s; }
+.module-item:nth-child(3) { animation-delay: 0.15s; }
+.module-item:nth-child(4) { animation-delay: 0.2s; }
+.module-item:nth-child(5) { animation-delay: 0.25s; }
+.module-item:nth-child(6) { animation-delay: 0.3s; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .promo-sec {
+        padding: 60px 0 !important;
+    }
+    
+    .display-2 {
+        font-size: 2.5rem !important;
+    }
+    
+    .module-footer .d-flex.gap-2 {
+        flex-direction: column !important;
+    }
+}
+</style>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Search functionality
+    const searchInput = document.getElementById('moduleSearch');
+    const moduleItems = document.querySelectorAll('.module-item');
+    const moduleCount = document.getElementById('moduleCount');
+    const emptyState = document.getElementById('emptyState');
+    const modulesContainer = document.getElementById('modules-container');
+    
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        let visibleCount = 0;
+
+        moduleItems.forEach(item => {
+            const moduleName = item.dataset.moduleName;
+            const courseName = item.dataset.courseName;
+            
+            if (moduleName.includes(searchTerm) || courseName.includes(searchTerm)) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        moduleCount.textContent = visibleCount;
+        
+        if (visibleCount === 0) {
+            emptyState.classList.remove('d-none');
+            modulesContainer.classList.add('d-none');
+        } else {
+            emptyState.classList.add('d-none');
+            modulesContainer.classList.remove('d-none');
+        }
+    });
+
+    // Quiz functionality
+    const buttons = document.querySelectorAll(".generate-quiz-btn");
+    const quizModal = new bootstrap.Modal(document.getElementById('quizModal'));
+    const quizForm = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitQuizBtn');
+    const scoreDisplay = document.getElementById('quizScore');
+
+    const choiceLabels = ['A', 'B', 'C', 'D', 'E']; // normalisation
+
+    buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const uri = btn.dataset.uri;
+
+            const spinner = btn.querySelector('.spinner-border');
+            const btnText = btn.querySelector('.btn-text');
+            btnText.classList.add('d-none');
+            spinner.classList.remove('d-none');
+
+            fetch(`/modules/generate_quiz/?uri=${encodeURIComponent(uri)}`, {
+                headers: { "X-CSRFToken": getCookie("csrftoken") }
+            })
+            .then(res => res.json())
+            .then(data => {
+                spinner.classList.add('d-none');
+                btnText.classList.remove('d-none');
+
+                if (data.quiz && data.quiz.length > 0) {
+                    console.log("Correct answers received:", data.quiz.map(q => q.answer));
+
+                    quizForm.innerHTML = "";
+                    scoreDisplay.textContent = "";
+
+                    data.quiz.forEach((q, i) => {
+                        let questionHTML = `<div class="mb-3" id="qContainer${i}">
+                            <p><strong>${i+1}. ${q.question}</strong></p>`;
+                        q.options.forEach((opt, idx) => {
+                            const value = choiceLabels[idx]; // 1er= A, 2ème=B, 3ème=C...
+                            questionHTML += `
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="q${i}" value="${value}" id="q${i}_${value}">
+                                    <label class="form-check-label" for="q${i}_${value}">${opt.label}</label>
+                                </div>`;
+                        });
+                        questionHTML += `</div>`;
+                        quizForm.innerHTML += questionHTML;
+                    });
+                    quizModal.show();
+
+                    submitBtn.onclick = () => {
+                        let score = 0;
+                        data.quiz.forEach((q, i) => {
+                            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                            const container = document.getElementById(`qContainer${i}`);
+                            container.querySelectorAll('label').forEach(l => l.style.color = '');
+                            const correctVal = q.answer.trim().toUpperCase();
+                            console.log(`Question ${i+1}: correct answer=${correctVal}, selected=${selected ? selected.value : 'none'}`);
+                            if (selected && selected.value.trim().toUpperCase() === correctVal) {
+                                score += 1;
+                                selected.nextElementSibling.style.color = 'green';
+                            } else {
+                                if (selected) selected.nextElementSibling.style.color = 'red';
+                                const correctInput = document.querySelector(`input[name="q${i}"][value="${correctVal}"]`);
+                                if (correctInput) correctInput.nextElementSibling.style.color = 'green';
+                            }
+                        });
+                        console.log("Score calculated:", score);
+                        scoreDisplay.textContent = `Votre score : ${score} / ${data.quiz.length}`;
+                    };
+                } else {
+                    alert("Erreur lors de la génération du quiz");
+                }
+            })
+            .catch(err => {
+                spinner.classList.add('d-none');
+                btnText.classList.remove('d-none');
+                console.error("Error fetching quiz:", err);
+                alert("Erreur lors de la génération du quiz (vérifiez la console)");
+            });
+        });
+    });
+
+    // Summarize functionality
+    const summarizeButtons = document.querySelectorAll(".summarize-module-btn");
+    const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
+    const summaryContent = document.getElementById('summaryContent');
+
+    summarizeButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const uri = btn.dataset.uri;
+
+            const spinner = btn.querySelector('.spinner-border');
+            const btnText = btn.querySelector('.btn-text');
+            btnText.classList.add('d-none');
+            spinner.classList.remove('d-none');
+
+            // Show modal with loading state
+            summaryContent.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Génération du résumé en cours...</p>
+                </div>
+            `;
+            summaryModal.show();
+
+            fetch(`/modules/summarize/?uri=${encodeURIComponent(uri)}`, {
+                headers: { "X-CSRFToken": getCookie("csrftoken") }
+            })
+            .then(res => res.json())
+            .then(data => {
+                spinner.classList.add('d-none');
+                btnText.classList.remove('d-none');
+
+                if (data.summary) {
+                    summaryContent.innerHTML = `
+                        <div class="bg-white p-4 rounded-3">
+                            <div class="mb-4">
+                                <h6 class="text-warning mb-3">
+                                    <i class="feather-icon icon-info me-2"></i>Résumé du contenu
+                                </h6>
+                                <div style="white-space: pre-wrap; line-height: 1.8; color: #475569;">
+                                    ${data.summary}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    summaryContent.innerHTML = `
+                        <div class="alert alert-warning" role="alert">
+                            <i class="feather-icon icon-alert-circle me-2"></i>
+                            Erreur lors de la génération du résumé
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                spinner.classList.add('d-none');
+                btnText.classList.remove('d-none');
+                console.error("Error fetching summary:", err);
+                summaryContent.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="feather-icon icon-x-circle me-2"></i>
+                        Erreur lors de la génération du résumé (vérifiez la console)
+                    </div>
+                `;
+            });
+        });
+    });
+
+    // Delete functionality
+    const deleteButtons = document.querySelectorAll(".delete-module-btn");
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteModuleName = document.getElementById('deleteModuleName');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    let currentDeleteUri = null;
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            currentDeleteUri = btn.dataset.uri;
+            deleteModuleName.textContent = btn.dataset.moduleName;
+            deleteModal.show();
+        });
+    });
+
+    confirmDeleteBtn.addEventListener("click", () => {
+        if (!currentDeleteUri) return;
+
+        // Show loading state
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Suppression...';
+
+        fetch(`/modules/delete/?uri=${encodeURIComponent(currentDeleteUri)}`, {
+            method: 'GET',
+            headers: { 
+                "X-CSRFToken": getCookie("csrftoken")
+            }
+        })
+        .then(res => {
+            // Remove the module card from DOM
+            const moduleCard = document.querySelector(`.delete-module-btn[data-uri="${currentDeleteUri}"]`).closest('.module-item');
+            moduleCard.style.animation = 'fadeOut 0.3s ease forwards';
+            
+            setTimeout(() => {
+                moduleCard.remove();
+                // Update count
+                const remainingModules = document.querySelectorAll('.module-item:not([style*="display: none"])').length;
+                moduleCount.textContent = remainingModules;
+                
+                // Show empty state if no modules left
+                if (remainingModules === 0) {
+                    emptyState.classList.remove('d-none');
+                    modulesContainer.classList.add('d-none');
+                }
+            }, 300);
+
+            deleteModal.hide();
+            
+            // Show success message
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            successAlert.style.zIndex = '9999';
+            successAlert.innerHTML = `
+                <i class="feather-icon icon-check-circle me-2"></i>
+                Module supprimé avec succès !
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(successAlert);
+            setTimeout(() => successAlert.remove(), 3000);
+        })
+        .catch(err => {
+            console.error("Error deleting module:", err);
+            alert("Erreur lors de la suppression du module");
+        })
+        .finally(() => {
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.innerHTML = '<i class="feather-icon icon-trash-2 me-2"></i>Supprimer';
+            currentDeleteUri = null;
+        });
+    });
+});
+</script>
+{% endblock %}

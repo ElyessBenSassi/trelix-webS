@@ -21,7 +21,7 @@ from . import views  # ✅ importer views
 
 
 urlpatterns = [
-       path('', views.home, name='home'),
+    #    path('', views.home, name='home'),
        path('classes/', classes_html_view),
        path("modules/", include("module.urls")),
        path("produit/", include("produit.urls")),

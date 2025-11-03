@@ -1,12 +1,415 @@
-<h1>{% if module %}Modifier{% else %}Créer{% endif %} Module</h1>
-<form method="post">
-    {% csrf_token %}
-    <label>Nom Module:</label>
-    <input type="text" name="nomModule" value="{{ module.nomModule|default:'' }}" required><br>
-    <label>Nom Cours:</label>
-    <input type="text" name="NomCours" value="{{ module.NomCours|default:'' }}" required><br>
-    <label>Contenu:</label>
-    <input type="text" name="Contenu" value="{{ module.Contenu|default:'' }}" required><br>
-    <button type="submit">{% if module %}Modifier{% else %}Créer{% endif %}</button>
-</form>
-<a href="{% url 'module_list' %}">Retour à la liste</a>
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}{% if module %}Modifier{% else %}Créer{% endif %} Module{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+
+<!-- Enhanced Promo Section -->
+{% get_static_prefix as STATIC_PREFIX %}
+<section class="promo-sec position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%), url('{{ STATIC_PREFIX }}images/promo-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding: 60px 0;">
+  <img src="{% static 'images/promo-left.png' %}" alt="" class="anim-img" style="opacity: 0.6;">
+  <img src="{% static 'images/promo-right.png' %}" alt="" class="anim-img anim-right" style="opacity: 0.6;">
+  <div class="container position-relative" style="z-index: 10;">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="display-4 text-white fw-bold mb-3" style="text-shadow: 0 2px 20px rgba(0,0,0,0.2);">
+          {% if module %}
+            <i class="feather-icon icon-edit-3 me-3"></i>Modifier le Module
+          {% else %}
+            <i class="feather-icon icon-plus-circle me-3"></i>Créer un Module
+          {% endif %}
+        </h1>
+        <p class="text-white-50 fs-5 mb-4">
+          {% if module %}
+            Mettez à jour les informations de votre module
+          {% else %}
+            Ajoutez un nouveau module d'apprentissage
+          {% endif %}
+        </p>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-center" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 50px; padding: 12px 24px; display: inline-flex;">
+            <li class="breadcrumb-item"><a href="/" class="text-white text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'module_list' %}" class="text-white text-decoration-none">Modules</a></li>
+            <li class="breadcrumb-item text-white-50" aria-current="page">{% if module %}Modifier{% else %}Créer{% endif %}</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Form Section -->
+<section class="py-5" style="background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%); min-height: calc(100vh - 400px);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+        <!-- Progress Indicator -->
+        <div class="mb-4 text-center">
+          <div class="d-inline-flex align-items-center gap-3 p-3 bg-white rounded-pill shadow-sm">
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                <i class="feather-icon icon-check text-white" style="font-size: 14px;"></i>
+              </div>
+              <span class="fw-semibold" style="color: #6366f1;">Informations</span>
+            </div>
+            <i class="feather-icon icon-chevron-right text-muted"></i>
+            <div class="d-flex align-items-center gap-2 opacity-50">
+              <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: #e2e8f0;">
+                <i class="feather-icon icon-save text-muted" style="font-size: 14px;"></i>
+              </div>
+              <span class="text-muted">Sauvegarde</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="card border-0 shadow-lg position-relative overflow-hidden" style="border-radius: 20px;">
+          <!-- Decorative gradient bar -->
+          <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);"></div>
+          
+          <div class="card-body p-5">
+            <form method="post" id="moduleForm">
+              {% csrf_token %}
+              
+              <!-- Form Header -->
+              <div class="text-center mb-5">
+                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 20px; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);">
+                  <i class="feather-icon icon-book-open text-white" style="font-size: 2rem;"></i>
+                </div>
+                <h3 class="fw-bold mb-2" style="color: #1e293b;">Détails du Module</h3>
+                <p class="text-muted mb-0">Remplissez les informations ci-dessous</p>
+              </div>
+
+              <!-- Nom du Module -->
+              <div class="mb-4">
+                <label for="nomModule" class="form-label fw-semibold d-flex align-items-center gap-2" style="color: #1e293b;">
+                  <i class="feather-icon icon-tag" style="font-size: 1rem; color: #6366f1;"></i>
+                  Nom du Module
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;">
+                    <i class="feather-icon icon-file-text text-muted"></i>
+                  </span>
+                  <input type="text" 
+                         class="form-control border-start-0 ps-0 form-input" 
+                         id="nomModule" 
+                         name="nomModule" 
+                         value="{{ module.nomModule|default:'' }}" 
+                         placeholder="Ex: Introduction à Python" 
+                         required
+                         style="border-radius: 0 12px 12px 0; border-left: none;">
+                </div>
+                <small class="text-muted ms-2">
+                  <i class="feather-icon icon-info" style="font-size: 0.875rem;"></i>
+                  Donnez un nom clair et descriptif à votre module
+                </small>
+              </div>
+
+              <!-- Nom du Cours -->
+              <div class="mb-4">
+                <label for="NomCours" class="form-label fw-semibold d-flex align-items-center gap-2" style="color: #1e293b;">
+                  <i class="feather-icon icon-book" style="font-size: 1rem; color: #6366f1;"></i>
+                  Nom du Cours
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;">
+                    <i class="feather-icon icon-bookmark text-muted"></i>
+                  </span>
+                  <input type="text" 
+                         class="form-control border-start-0 ps-0 form-input" 
+                         id="NomCours" 
+                         name="NomCours" 
+                         value="{{ module.NomCours|default:'' }}" 
+                         placeholder="Ex: Programmation Web"
+                         required
+                         style="border-radius: 0 12px 12px 0; border-left: none;">
+                </div>
+                <small class="text-muted ms-2">
+                  <i class="feather-icon icon-info" style="font-size: 0.875rem;"></i>
+                  Le cours auquel ce module est rattaché
+                </small>
+              </div>
+
+              <!-- Contenu -->
+              <div class="mb-4">
+                <label for="Contenu" class="form-label fw-semibold d-flex align-items-center gap-2" style="color: #1e293b;">
+                  <i class="feather-icon icon-align-left" style="font-size: 1rem; color: #6366f1;"></i>
+                  Contenu du Module
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="position-relative">
+                  <textarea class="form-control form-input" 
+                            id="Contenu" 
+                            name="Contenu" 
+                            rows="8" 
+                            placeholder="Décrivez le contenu du module en détail..."
+                            required
+                            style="border-radius: 12px; padding: 20px; resize: vertical; min-height: 200px;">{{ module.Contenu|default:'' }}</textarea>
+                  <div class="position-absolute bottom-0 end-0 p-3">
+                    <small class="text-muted" id="charCount">0 caractères</small>
+                  </div>
+                </div>
+                <small class="text-muted ms-2">
+                  <i class="feather-icon icon-info" style="font-size: 0.875rem;"></i>
+                  Ajoutez une description complète et détaillée du contenu
+                </small>
+              </div>
+
+              <!-- Divider -->
+              <hr class="my-5" style="border-top: 2px dashed #e2e8f0;">
+
+              <!-- Action Buttons -->
+              <div class="d-flex gap-3 justify-content-between align-items-center">
+                <a href="{% url 'module_list' %}" class="btn btn-lg btn-light d-flex align-items-center gap-2 px-4" style="border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 500; transition: all 0.3s ease;">
+                  <i class="feather-icon icon-arrow-left"></i>
+                  <span>Retour</span>
+                </a>
+                
+                <div class="d-flex gap-3">
+                  <button type="button" class="btn btn-lg btn-outline-secondary d-flex align-items-center gap-2 px-4" id="previewBtn" style="border-radius: 12px; font-weight: 500; transition: all 0.3s ease;">
+                    <i class="feather-icon icon-eye"></i>
+                    <span>Aperçu</span>
+                  </button>
+                  
+                  <button type="submit" class="btn btn-lg d-flex align-items-center gap-2 px-5" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 500; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transition: all 0.3s ease;">
+                    <i class="feather-icon icon-save"></i>
+                    <span>{% if module %}Mettre à jour{% else %}Créer le module{% endif %}</span>
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+        <!-- Tips Card -->
+        <div class="card border-0 shadow-sm mt-4" style="border-radius: 16px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3 d-flex align-items-center gap-2" style="color: #92400e;">
+              <i class="feather-icon icon-lightbulb"></i>
+              Conseils pour créer un bon module
+            </h6>
+            <ul class="mb-0 ps-4" style="color: #78350f; line-height: 1.8;">
+              <li>Utilisez un titre clair et concis qui reflète le contenu</li>
+              <li>Organisez le contenu de manière logique et structurée</li>
+              <li>Incluez des exemples pratiques pour faciliter la compréhension</li>
+              <li>Assurez-vous que le contenu est complet et cohérent</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      <div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 30px 30px 80px 30px; position: relative;">
+        <div>
+          <h5 class="modal-title text-white fw-bold fs-3 mb-2" id="previewModalLabel">
+            <i class="feather-icon icon-eye me-2"></i>Aperçu du Module
+          </h5>
+          <p class="text-white-50 mb-0 fs-6">Vérifiez les informations avant de sauvegarder</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4" style="background: #f8f9fa;">
+        <div id="previewContent" class="bg-white p-4 rounded-3">
+          <!-- Preview content will be inserted here -->
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-white p-4">
+        <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal" style="border-radius: 12px;">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'trelix_app/footer.html' %}
+
+<style>
+/* Form Input Styling */
+.form-input {
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    outline: none;
+}
+
+.input-group-text {
+    border: 2px solid #e2e8f0;
+    border-right: none;
+}
+
+.form-input:focus + .input-group-text,
+.input-group:focus-within .input-group-text {
+    border-color: #6366f1;
+}
+
+/* Button Hover Effects */
+.btn-light:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Card Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Textarea Character Count */
+#charCount {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+/* Label Icon Animation */
+.form-label i {
+    transition: transform 0.3s ease;
+}
+
+.form-input:focus ~ .form-label i,
+.form-label:hover i {
+    transform: scale(1.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .promo-sec {
+        padding: 40px 0 !important;
+    }
+    
+    .display-4 {
+        font-size: 2rem !important;
+    }
+    
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .d-flex.gap-3.justify-content-between {
+        flex-direction: column;
+    }
+    
+    .d-flex.gap-3.justify-content-between > div {
+        width: 100%;
+    }
+    
+    .d-flex.gap-3.justify-content-between button,
+    .d-flex.gap-3.justify-content-between a {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const contenuField = document.getElementById('Contenu');
+    const charCount = document.getElementById('charCount');
+    const previewBtn = document.getElementById('previewBtn');
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    const previewContent = document.getElementById('previewContent');
+    const moduleForm = document.getElementById('moduleForm');
+
+    // Character counter
+    function updateCharCount() {
+        const count = contenuField.value.length;
+        charCount.textContent = `${count} caractère${count > 1 ? 's' : ''}`;
+    }
+
+    contenuField.addEventListener('input', updateCharCount);
+    updateCharCount(); // Initial count
+
+    // Preview functionality
+    previewBtn.addEventListener('click', () => {
+        const nomModule = document.getElementById('nomModule').value;
+        const nomCours = document.getElementById('NomCours').value;
+        const contenu = document.getElementById('Contenu').value;
+
+        if (!nomModule || !nomCours || !contenu) {
+            alert('Veuillez remplir tous les champs avant de prévisualiser');
+            return;
+        }
+
+        previewContent.innerHTML = `
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="feather-icon icon-tag" style="color: #6366f1;"></i>
+                    <span class="text-muted small fw-semibold">NOM DU MODULE</span>
+                </div>
+                <h4 class="fw-bold mb-0" style="color: #1e293b;">${nomModule}</h4>
+            </div>
+            
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="feather-icon icon-book" style="color: #6366f1;"></i>
+                    <span class="text-muted small fw-semibold">COURS ASSOCIÉ</span>
+                </div>
+                <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); font-size: 0.9rem; border-radius: 8px;">
+                    ${nomCours}
+                </span>
+            </div>
+            
+            <div class="mb-0">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="feather-icon icon-align-left" style="color: #6366f1;"></i>
+                    <span class="text-muted small fw-semibold">CONTENU</span>
+                </div>
+                <div class="p-3 rounded-3" style="background: #f8f9fa; white-space: pre-wrap; line-height: 1.8; color: #475569;">
+                    ${contenu}
+                </div>
+            </div>
+        `;
+
+        previewModal.show();
+    });
+
+    // Form submission animation
+    moduleForm.addEventListener('submit', (e) => {
+        const submitBtn = moduleForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enregistrement...';
+    });
+
+    // Auto-resize textarea
+    contenuField.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.max(200, this.scrollHeight) + 'px';
+    });
+});
+</script>
+{% endblock %}
