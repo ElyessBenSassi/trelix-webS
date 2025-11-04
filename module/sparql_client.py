@@ -1,20 +1,44 @@
 from SPARQLWrapper import SPARQLWrapper, JSON, POST
+import re
 
 FUSEKI_URL = "http://localhost:3030/trelix"
 BASE_URI = "http://example.com/module/"
 
+def clean_literal(value):
+    """Nettoie une valeur textuelle basique pour SPARQL (échappe les guillemets)."""
+    if not value:
+        return ""
+    cleaned = value.replace('"', '\\"').replace("'", "\\'")
+    return cleaned.strip()
+
+
+def clean_alpha(value):
+    """Supprime tout caractère non alphabétique (A–Z ou a–z)."""
+    if not value:
+        return ""
+    return ''.join(re.findall(r'[A-Za-z]', value)) 
+
 def insert_module(uri, nomModule, NomCours, Contenu):
     sparql = SPARQLWrapper(f"{FUSEKI_URL}/update")
     sparql.setMethod(POST)
-    sparql.setQuery(f"""
-    PREFIX ex: <http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#>
+
+    safe_nomModule = clean_literal(nomModule)
+    safe_NomCours = clean_literal(NomCours)
+
+    # Nettoyage automatique : garde seulement les lettres
+    safe_Contenu = clean_alpha(Contenu)
+
+    query = f"""
+    PREFIX ex: <{BASE_URI}>
     INSERT DATA {{
         <{BASE_URI}{uri}> a ex:Module ;
-            ex:nomModule "{nomModule}" ;
-            ex:NomCours "{NomCours}" ;
-            ex:Contenu "{Contenu}" .
+            ex:nomModule "{safe_nomModule}" ;
+            ex:NomCours "{safe_NomCours}" ;
+            ex:Contenu "{safe_Contenu}" .
     }}
-    """)
+    """
+
+    sparql.setQuery(query)
     sparql.query()
 
 def get_modules():
