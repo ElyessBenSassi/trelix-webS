@@ -11,6 +11,7 @@ from huggingface_hub import InferenceClient
 import requests
 
 
+
 # Génération automatique d'une URI "safe"
 def generate_uri(nomModule):
     safe_name = nomModule.replace(" ", "_")
