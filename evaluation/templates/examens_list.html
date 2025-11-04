@@ -1,119 +1,452 @@
-
 {% extends "trelix_app/base.html" %} 
 {% load static %}
-{% block title %} Evaluation {% endblock %} 
+{% block title %}Évaluations - Trelix{% endblock %} 
 {% block content %}
 {% include 'trelix_app/header.html' %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Liste des examens</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% get_static_prefix as STATIC_PREFIX %}
+<section class="promo-sec position-relative overflow-hidden"
+ style="background: linear-gradient(135deg, rgba(99,102,241,.95) 0%, rgba(139,92,246,.95) 100%); padding:60px 0;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="display-4 text-white fw-bold mb-3">
+          <i class="feather-icon icon-file-text"></i> Gestion des Examens
+        </h1>
+        <p class="text-white-50 fs-5 mb-4">
+          Gérez et organisez tous vos examens en un seul endroit
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <style>
-       
-        .card { animation: fadeIn .7s; border-radius: 15px; }
-        @keyframes fadeIn { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: none;} }
-        th, td { text-align: center; vertical-align: middle; }
-        .badge-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #fff;
-        }
-    </style>
-</head>
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12">
 
-<body>
-
-<div class="container">
-    <div class="card shadow-lg p-4">
-
-        <h2 class="text-center text-primary mb-4">📘 Gestion des Examens</h2>
-
-        <!-- ✅ Formulaire de recherche -->
-        <form method="GET" class="mb-3">
-            <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Rechercher..."
-                       value="{{ search }}">
-                <button class="btn btn-dark">🔍</button>
+        <div class="card border-0 shadow-lg custom-card mb-4">
+          <div class="card-body p-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h3 class="h4 mb-0 text-dark">
+                  <i class="feather-icon icon-list me-2"></i>
+                  Liste des Examens
+                </h3>
+              </div>
+              <div class="col-md-4 text-end">
+                <a href="/api/examens/ajouter/" class="btn btn-custom-primary">
+                  <i class="feather-icon icon-plus-circle me-2"></i>
+                  Ajouter un examen
+                </a>
+              </div>
             </div>
-        </form>
-
-        <div class="text-end mb-3">
-            <a href="/api/examens/ajouter/" class="btn btn-success">➕ Ajouter un examen</a>
+          </div>
         </div>
 
-        <table class="table table-hover table-striped align-middle">
-            <thead class="table-dark">
-            <tr>
-                <th>ID</th>
+        <!-- ✅ Formulaire de recherche -->
+        <div class="card border-0 shadow-sm custom-card mb-4">
+          <div class="card-body p-4">
+            <form method="GET" class="row g-3 align-items-end">
+              <div class="col-md-8">
+                <label class="form-label-custom">Rechercher un examen</label>
+                <div class="input-wrapper">
+                  <input type="text" name="search" class="form-control-custom" 
+                         placeholder="Rechercher par nom, description..." value="{{ search }}">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <button type="submit" class="btn btn-custom-primary w-100">
+                  <i class="feather-icon icon-search me-2"></i>
+                  Rechercher
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
 
-                <!-- ✅ Tri par nom -->
-                <th>
-                    Nom
-                    <a href="?order=nom&search={{ search }}">▲</a>
-                    <a href="?order=-nom&search={{ search }}">▼</a>
-                </th>
+        <div class="card border-0 shadow-lg custom-card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-custom-header">
+                  <tr>
+                    <th class="ps-4">ID</th>
 
-                <!-- ✅ Tri par date -->
-                <th>
-                    Date
-                    <a href="?order=date_examen&search={{ search }}">▲</a>
-                    <a href="?order=-date_examen&search={{ search }}">▼</a>
-                </th>
+                    <!-- ✅ Tri par nom -->
+                    <th>
+                      <div class="d-flex align-items-center gap-1">
+                        <span>Nom</span>
+                        <div class="sort-buttons">
+                          <a href="?order=nom&search={{ search }}" class="sort-link" title="Tri croissant">▲</a>
+                          <a href="?order=-nom&search={{ search }}" class="sort-link" title="Tri décroissant">▼</a>
+                        </div>
+                      </div>
+                    </th>
 
-                <!-- ✅ Tri par note -->
-                <th>
-                    Note max
-                    <a href="?order=note_max&search={{ search }}">▲</a>
-                    <a href="?order=-note_max&search={{ search }}">▼</a>
-                </th>
+                    <!-- ✅ Tri par date -->
+                    <th>
+                      <div class="d-flex align-items-center gap-1">
+                        <span>Date</span>
+                        <div class="sort-buttons">
+                          <a href="?order=date_examen&search={{ search }}" class="sort-link" title="Tri croissant">▲</a>
+                          <a href="?order=-date_examen&search={{ search }}" class="sort-link" title="Tri décroissant">▼</a>
+                        </div>
+                      </div>
+                    </th>
 
-                <th>Description</th>
-                <th>Badge</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for examen in examens %}
-                <tr>
-                    <td>{{ examen.id }}</td>
-                    <td class="text-start fw-semibold">{{ examen.nom }}</td>
-                    <td>{{ examen.date_examen|date:"d/m/Y" }}</td>
-                    <td>{{ examen.note_max }}</td>
-                    <td class="text-start">{{ examen.description|default:"—" }}</td>
+                    <!-- ✅ Tri par note -->
+                    <th>
+                      <div class="d-flex align-items-center gap-1">
+                        <span>Note max</span>
+                        <div class="sort-buttons">
+                          <a href="?order=note_max&search={{ search }}" class="sort-link" title="Tri croissant">▲</a>
+                          <a href="?order=-note_max&search={{ search }}" class="sort-link" title="Tri décroissant">▼</a>
+                        </div>
+                      </div>
+                    </th>
 
+                    <th>Description</th>
+                    <th>Badge</th>
+                    <th class="text-end pe-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for examen in examens %}
+                  <tr class="table-row-custom">
+                    <td class="ps-4 fw-semibold text-primary">{{ examen.id }}</td>
+                    <td class="fw-semibold text-dark">{{ examen.nom }}</td>
                     <td>
-                        {% if examen.badge and examen.badge.image %}
-                            <img src="{{ examen.badge.image.url }}" class="badge-img" alt="badge">
-                        {% else %}
-                            {{ examen.badge.type|default:"—" }}
-                        {% endif %}
+                      <span class="badge bg-light text-dark border">
+                        {{ examen.date_examen|date:"d/m/Y" }}
+                      </span>
                     </td>
-
                     <td>
-                        <a href="/api/examens/modifier/{{ examen.id }}/" class="btn btn-primary btn-sm me-1">✏ Modifier</a>
+                      <span class="badge bg-warning text-dark">
+                        {{ examen.note_max }}
+                      </span>
+                    </td>
+                    <td class="text-muted">
+                      {{ examen.description|default:"—"|truncatewords:10 }}
+                    </td>
+                    <td>
+                      {% if examen.badge and examen.badge.image %}
+                        <img src="{{ examen.badge.image.url }}" class="badge-img" alt="badge">
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-end pe-4">
+                      <div class="btn-group-custom">
+                        <a href="/api/examens/modifier/{{ examen.id }}/" class="btn btn-action-primary" title="Modifier">
+                          <i class="feather-icon icon-edit-3"></i>
+                        </a>
                         <a href="/api/examens/supprimer/{{ examen.id }}/"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Voulez-vous vraiment supprimer cet examen ?')">🗑 Supprimer</a>
+                           class="btn btn-action-danger"
+                           title="Supprimer"
+                           onclick="return confirm('Voulez-vous vraiment supprimer cet examen ?')">
+                          <i class="feather-icon icon-trash-2"></i>
+                        </a>
+                      </div>
                     </td>
-                </tr>
-            {% empty %}
-                <tr class="bg-danger bg-opacity-25">
-                    <td colspan="7" class="text-center text-danger fw-bold">Aucun examen trouvé 😕</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center py-5">
+                      <div class="empty-state">
+                        <i class="feather-icon icon-file-text display-1 text-muted mb-3"></i>
+                        <h5 class="text-muted">Aucun examen trouvé</h5>
+                        <p class="text-muted mb-4">Commencez par ajouter votre premier examen</p>
+                        <a href="/api/examens/ajouter/" class="btn btn-custom-primary">
+                          <i class="feather-icon icon-plus-circle me-2"></i>
+                          Ajouter un examen
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
+      </div>
     </div>
-</div>
+  </div>
+</section>
 
-</body>
-</html>
+<style>
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary-color: #6c757d;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --border-color: #e2e8f0;
+  --shadow-light: 0 2px 15px rgba(0,0,0,0.08);
+  --shadow-medium: 0 5px 25px rgba(0,0,0,0.1);
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.custom-card {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Labels */
+.form-label-custom {
+  color: #1e293b !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Input */
+.form-control-custom {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.form-control-custom:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Buttons */
+.btn-custom-primary {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-custom-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  color: white;
+}
+
+/* Table Styles */
+.table-custom-header {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.table-custom-header th {
+  border: none;
+  padding: 16px 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.table-row-custom {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-row-custom:hover {
+  background: rgba(99, 102, 241, 0.03);
+  transform: translateX(5px);
+}
+
+.table-row-custom td {
+  padding: 16px 12px;
+  border: none;
+}
+
+/* Sort Buttons - PLUS VISIBLES */
+.sort-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.sort-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.8rem;
+  line-height: 0.8;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 12px;
+}
+
+.sort-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Action Buttons */
+.btn-group-custom {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-action-primary,
+.btn-action-danger {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action-primary {
+  background: var(--primary-color);
+}
+
+.btn-action-danger {
+  background: var(--danger-color);
+}
+
+.btn-action-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.btn-action-danger:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  color: white;
+}
+
+/* Badge Image */
+.badge-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+}
+
+/* Empty State */
+.empty-state {
+  padding: 3rem 1rem;
+}
+
+/* Badges */
+.badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-card {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+  
+  .btn-group-custom {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .btn-action-primary,
+  .btn-action-danger {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .sort-buttons {
+    flex-direction: row;
+    gap: 4px;
+  }
+  
+  .sort-link {
+    width: 18px;
+    height: 10px;
+    font-size: 0.7rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Animation pour les lignes du tableau
+  const tableRows = document.querySelectorAll('.table-row-custom');
+  
+  tableRows.forEach((row, index) => {
+    row.style.animationDelay = `${index * 0.1}s`;
+  });
+
+  // Confirmation de suppression
+  const deleteButtons = document.querySelectorAll('.btn-action-danger');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      if (!confirm('Voulez-vous vraiment supprimer cet examen ?')) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  // Highlight des liens de tri actifs
+  const currentUrl = new URL(window.location.href);
+  const currentOrder = currentUrl.searchParams.get('order');
+  
+  if (currentOrder) {
+    const sortLinks = document.querySelectorAll('.sort-link');
+    sortLinks.forEach(link => {
+      if (link.href.includes(`order=${currentOrder}`)) {
+        link.style.background = 'rgba(255, 255, 255, 0.4)';
+        link.style.color = 'white';
+        link.style.fontWeight = 'bold';
+      }
+    });
+  }
+});
+</script>
+
 {% include 'trelix_app/footer.html' %}
 {% endblock %}
