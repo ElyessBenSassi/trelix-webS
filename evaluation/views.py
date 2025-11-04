@@ -36,7 +36,7 @@ def examen_ajouter(request):
             examen = form.save()
             creer_achievement_automatique(examen)
             envoyer_examen_fuseki(examen)
-            return redirect('/api/examens/')
+            return redirect('/api/')
     else:
         form = ExamenForm()
     return render(request, 'examen_form.html', {'form': form, 'title': "Ajouter un examen"})
