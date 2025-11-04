@@ -38,7 +38,13 @@ SECRET_KEY = 'django-insecure-6f3kumesh2k9cr30vb56*z@^y9zhjx_+ep0bv9#_#iw-(vl&*b
 DEBUG = True
 
 ALLOWED_HOSTS = []
+from dotenv import load_dotenv
+import os
 
+dotenv_path = os.path.join(BASE_DIR, '.env')
+load_dotenv(BASE_DIR / '.env')
+
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
 # Application definition
 
@@ -49,9 +55,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'trelix_app',
+    'leaderboared',
+    'goal',
      'rest_framework',
     'evaluation',
-    'trelix_app',
     'activity',
     'person',
     'module',

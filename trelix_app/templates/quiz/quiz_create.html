@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="text"]:focus {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .questions-container {
+            margin-top: 2rem;
+        }
+
+        .question-block {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s;
+        }
+
+        .question-block:focus-within {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .question-number {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .remove-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .remove-btn:hover {
+            background: #ff5252;
+        }
+
+        .choices-container {
+            margin-top: 1rem;
+        }
+
+        .choice-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .choice-item input[type="text"] {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .choice-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .correct-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-add {
+            background: #667eea;
+            color: white;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-add:hover {
+            background: #5568d3;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-card {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✏️ Create New Quiz</h1>
+        </div>
+
+        <div class="form-card">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="quizTitle">Quiz Title *</label>
+                    <input type="text" id="quizTitle" name="quizTitle" placeholder="e.g., Python Basics, World Geography" required>
+                    <p class="help-text">Give your quiz a clear, descriptive title</p>
+                </div>
+
+                <div class="questions-container" id="questions-container">
+                    <div class="question-block" data-question="0">
+                        <div class="question-header">
+                            <span class="question-number">Question 1</span>
+                            <button type="button" class="remove-btn" onclick="removeQuestion(0)" style="display: none;">Remove</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Question Text *</label>
+                            <input type="text" name="questions[0][text]" placeholder="What is your question?" required>
+                        </div>
+
+                        <label style="font-weight: 600; display: block; margin-bottom: 0.75rem;">Answer Choices</label>
+                        <div class="choices-container">
+                            <div class="choice-item">
+                                <input type="text" name="questions[0][choices][0][text]" placeholder="Choice 1" required>
+                                <label class="correct-label">
+                                    <input type="checkbox" name="questions[0][choices][0][isCorrect]">
+                                    Correct
+                                </label>
+                            </div>
+                            <div class="choice-item">
+                                <input type="text" name="questions[0][choices][1][text]" placeholder="Choice 2">
+                                <label class="correct-label">
+                                    <input type="checkbox" name="questions[0][choices][1][isCorrect]">
+                                    Correct
+                                </label>
+                            </div>
+                            <div class="choice-item">
+                                <input type="text" name="questions[0][choices][2][text]" placeholder="Choice 3">
+                                <label class="correct-label">
+                                    <input type="checkbox" name="questions[0][choices][2][isCorrect]">
+                                    Correct
+                                </label>
+                            </div>
+                            <div class="choice-item">
+                                <input type="text" name="questions[0][choices][3][text]" placeholder="Choice 4">
+                                <label class="correct-label">
+                                    <input type="checkbox" name="questions[0][choices][3][isCorrect]">
+                                    Correct
+                                </label>
+                            </div>
+                        </div>
+                        <p class="help-text">Check at least one answer as correct</p>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-add" onclick="addQuestion()">+ Add Another Question</button>
+
+                <div class="buttons">
+                    <button type="submit" class="btn btn-primary">Save Quiz</button>
+                    <a href="{% url 'quiz_list' %}" class="btn btn-secondary" style="text-align: center; text-decoration: none;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let questionCount = 1;
+
+        function addQuestion() {
+            const container = document.getElementById('questions-container');
+            const newQuestion = document.createElement('div');
+            newQuestion.className = 'question-block';
+            newQuestion.setAttribute('data-question', questionCount);
+            newQuestion.innerHTML = `
+                <div class="question-header">
+                    <span class="question-number">Question ${questionCount + 1}</span>
+                    <button type="button" class="remove-btn" onclick="removeQuestion(${questionCount})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label>Question Text *</label>
+                    <input type="text" name="questions[${questionCount}][text]" placeholder="What is your question?" required>
+                </div>
+                <label style="font-weight: 600; display: block; margin-bottom: 0.75rem;">Answer Choices</label>
+                <div class="choices-container">
+                    <div class="choice-item">
+                        <input type="text" name="questions[${questionCount}][choices][0][text]" placeholder="Choice 1" required>
+                        <label class="correct-label">
+                            <input type="checkbox" name="questions[${questionCount}][choices][0][isCorrect]">
+                            Correct
+                        </label>
+                    </div>
+                    <div class="choice-item">
+                        <input type="text" name="questions[${questionCount}][choices][1][text]" placeholder="Choice 2">
+                        <label class="correct-label">
+                            <input type="checkbox" name="questions[${questionCount}][choices][1][isCorrect]">
+                            Correct
+                        </label>
+                    </div>
+                    <div class="choice-item">
+                        <input type="text" name="questions[${questionCount}][choices][2][text]" placeholder="Choice 3">
+                        <label class="correct-label">
+                            <input type="checkbox" name="questions[${questionCount}][choices][2][isCorrect]">
+                            Correct
+                        </label>
+                    </div>
+                    <div class="choice-item">
+                        <input type="text" name="questions[${questionCount}][choices][3][text]" placeholder="Choice 4">
+                        <label class="correct-label">
+                            <input type="checkbox" name="questions[${questionCount}][choices][3][isCorrect]">
+                            Correct
+                        </label>
+                    </div>
+                </div>
+                <p class="help-text">Check at least one answer as correct</p>
+            `;
+            container.appendChild(newQuestion);
+            questionCount++;
+        }
+
+        function removeQuestion(index) {
+            const block = document.querySelector(`[data-question="${index}"]`);
+            if (block) {
+                block.remove();
+            }
+        }
+    </script>
+</body>
+</html>

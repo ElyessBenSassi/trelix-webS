@@ -1,0 +1,238 @@
+{% extends "trelix_app/base.html" %} 
+
+{% block title %} leaderboard {% endblock %} 
+{% block content %}
+{% include 'trelix_app/header.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+           
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .leaderboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .leaderboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 0.5fr 2fr 1.5fr 1fr;
+            gap: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .leaderboard-body {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-entry {
+            display: grid;
+            grid-template-columns: 0.5fr 2fr 1.5fr 1fr;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .leaderboard-entry:hover {
+            background-color: #f9f9f9;
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #667eea;
+        }
+
+        .rank.rank-1 {
+            color: #ffd700;
+            font-size: 1.5rem;
+        }
+
+        .rank.rank-2 {
+            color: #c0c0c0;
+        }
+
+        .rank.rank-3 {
+            color: #cd7f32;
+        }
+
+        .medal {
+            margin-right: 0.5rem;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+        }
+
+        .score {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .quiz-title {
+            color: #666;
+            font-size: 0.9rem;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .leaderboard-header,
+            .leaderboard-entry {
+                grid-template-columns: 0.4fr 1.2fr 0.8fr;
+                gap: 0.75rem;
+            }
+
+            .quiz-title {
+                display: none;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Global Leaderboard</h1>
+            <p>Top performers across all quizzes</p>
+        </div>
+
+        <div class="leaderboard-card">
+            <div class="leaderboard-header">
+                <div>Rank</div>
+                <div>Player</div>
+                <div>Quiz</div>
+                <div>Score</div>
+            </div>
+
+            <div class="leaderboard-body">
+                {% if entries %}
+                    {% for e in entries %}
+                        <div class="leaderboard-entry">
+                            <div class="rank {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
+                                {% if forloop.counter == 1 %}
+                                    <span class="medal">🥇</span>
+                                {% elif forloop.counter == 2 %}
+                                    <span class="medal">🥈</span>
+                                {% elif forloop.counter == 3 %}
+                                    <span class="medal">🥉</span>
+                                {% else %}
+                                    {{ forloop.counter }}
+                                {% endif %}
+                            </div>
+                            <div class="player-info">
+                                <div class="player-avatar">{{ e.playerName|first|upper }}</div>
+                                <div class="player-name">{{ e.playerName }}</div>
+                            </div>
+                            <div class="quiz-title">{{ e.quizTitle }}</div>
+                            <div class="score">{{ e.score }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>No leaderboard entries yet.</p>
+                        <p style="font-size: 0.9rem; color: #ccc;">Create a quiz and play to see rankings!</p>
+                    </div>
+                {% endif %}
+
+
+            </div>
+            
+        </div>
+        <a href="{% url 'create_quiz' %}" class="btn btn-primary">+ Create Quiz</a>
+            <a href="{% url 'quiz_list' %}" class="btn btn-primary">+ List Quizzes</a>
+    </div>
+</body>
+</html>
+
+{% endblock %}

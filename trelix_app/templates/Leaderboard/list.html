@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QCM Leaderboard</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+<h1>QCM Leaderboard</h1>
+
+<a href="{% url 'leaderboard_create' %}">+ Add Entry</a>
+
+<table border="1" cellpadding="8" style="margin-top:20px;">
+<tr>
+    <th>Player Name</th>
+    <th>Score</th>
+    <th>Quiz</th>
+    <th>Actions</th>
+</tr>
+{% for entry in leaderboards %}
+<tr>
+    <td>{{ entry.playerName|default:"(No Name)" }}</td>
+    <td>{{ entry.score|default:"0" }}</td>
+    <td>{{ entry.quizTitle|default:"-" }}</td>
+    <td>
+    
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<script>
+function deleteEntry(entryId){
+    if(confirm('Delete this entry?')){
+        fetch(`/leaderboard/${entryId}/delete/`, {
+            method: 'POST',  // use POST for CSRF-safe deletion
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) location.reload();
+            else alert('Error deleting entry');
+        })
+        .catch(err => alert('Error deleting entry'));
+    }
+}
+</script>
+</body>
+</html>

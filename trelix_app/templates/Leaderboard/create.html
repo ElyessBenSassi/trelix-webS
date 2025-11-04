@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create QCM Leaderboard Entry</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+<h1>Create QCM Leaderboard Entry</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Player Name:</label><br>
+    <input type="text" name="playerName" required><br><br>
+
+    <label>Score:</label><br>
+    <input type="number" name="score" required><br><br>
+
+    <label>Quiz Title:</label><br>
+    <input type="text" name="quizTitle"><br><br>
+
+    <button type="submit">Save</button>
+    <a href="{% url 'leaderboard_list' %}">Cancel</a>
+</form>
+</body>
+</html>
