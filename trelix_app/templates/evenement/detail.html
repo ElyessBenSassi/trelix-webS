@@ -1,0 +1,548 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}{{ evenement.nomEvenement }} - Trelix{% endblock %}
+
+{% block content %}
+{% include 'trelix_app/header.html' %}
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Promo Section Start -->
+<section class="promo-sec2">
+   <div class="container">
+      <div class="row">
+         <div class="col-lg-7">
+            <nav aria-label="breadcrumb mt-0">
+               <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'evenement:evenement_list' %}">Événements</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">{{ evenement.nomEvenement }}</li>
+               </ol>
+            </nav>
+            <div class="course-intro">
+               <h1>{{ evenement.nomEvenement }}</h1>
+               <p class="lead">{{ evenement.typeEvenement }} - {{ evenement.lieu }}</p>
+            </div>
+         </div>
+      </div>
+   </div>
+</section>
+<!-- Promo Section End -->
+
+<!-- Event Details Start -->
+<section class="course-details-sec">
+   <div class="container">
+      <div class="row">
+         <div class="col-lg-8">
+            <article class="course-details pe-lg-4">
+               <!-- Large format image -->
+               <div class="event-hero-image mb-4">
+                  {% if evenement.image %}
+<img class="rounded-3 img-fluid w-100 event-main-image" src="/media/{{ evenement.image }}" alt="{{ evenement.nomEvenement }}" style="max-height: 500px; object-fit: cover;">
+                  {% else %}
+                     <div class="bg-secondary rounded-3 d-flex align-items-center justify-content-center event-placeholder" style="height: 400px;">
+                        <div class="text-center text-white">
+                           <i class="feather-icon icon-calendar display-1"></i>
+                           <p class="mt-2 mb-0">Aucune image disponible</p>
+                        </div>
+                     </div>
+                  {% endif %}
+               </div>
+
+               <!-- Event Tabs Start -->
+               <div class="course-nav mt-5">
+                  <nav id="navbar-example2" class="bg-white sticky-top">
+                     <ul class="nav nav-pills">
+                        <li class="nav-item">
+                           <a class="nav-link active" href="#overview"><i class="feather-icon icon-bookmark"></i> Aperçu</a>
+                        </li>
+                        <li class="nav-item">
+                           <a class="nav-link" href="#details"><i class="feather-icon icon-info"></i> Détails</a>
+                        </li>
+                        <li class="nav-item">
+                           <a class="nav-link" href="#description"><i class="feather-icon icon-align-left"></i> Description</a>
+                        </li>
+                     </ul>
+                  </nav>
+                  
+                  <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0"
+                     class="scrollspy-example" tabindex="0">
+                     
+                     <!-- Overview Section -->
+                     <div class="inner-sec" id="overview">
+                        <h2 class="display-4 fw-bold">Aperçu de l'Événement</h2>
+                        <p class="lead">{{ evenement.description }}</p>
+                        
+                        <div class="row mt-4">
+                           <div class="col-md-6">
+                              <div class="info-card bg-light p-3 rounded-3 h-100">
+                                 <h5 class="display-5"><i class="feather-icon icon-calendar text-primary me-2"></i> Date et Heure</h5>
+                                 <p class="mb-1"><strong>Début:</strong> {{ evenement.dateDebut }}</p>
+                                 <p class="mb-0"><strong>Fin:</strong> {{ evenement.dateFin }}</p>
+                                 <p class="mt-2 text-muted small">
+                                    <i class="feather-icon icon-clock me-1"></i>
+                                    Statut: 
+                                    {% now "Y-m-d" as current_date %}
+                                    {% if evenement.dateFin >= current_date %}
+                                       <span class="text-success">À venir</span>
+                                    {% else %}
+                                       <span class="text-secondary">Terminé</span>
+                                    {% endif %}
+                                 </p>
+                              </div>
+                           </div>
+                           <div class="col-md-6">
+                              <div class="info-card bg-light p-3 rounded-3 h-100">
+                                 <h5 class="display-5"><i class="feather-icon icon-map-pin text-primary me-2"></i> Lieu</h5>
+                                 <p class="mb-0"><strong>Localisation:</strong> {{ evenement.lieu }}</p>
+                                 <p class="mt-2 text-muted small">
+                                    <i class="feather-icon icon-navigation me-1"></i>
+                                    Événement en présentiel
+                                 </p>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <!-- Details Section -->
+                     <div class="inner-sec" id="details">
+                        <h2 class="display-4 fw-bold">Détails de l'Événement</h2>
+                        
+                        <div class="event-details-grid">
+                           <div class="detail-item">
+                              <i class="feather-icon icon-tag"></i>
+                              <div>
+                                 <strong>Type d'Événement</strong>
+                                 <p>{{ evenement.typeEvenement }}</p>
+                              </div>
+                           </div>
+                           
+                           <div class="detail-item">
+                              <i class="feather-icon icon-calendar"></i>
+                              <div>
+                                 <strong>Date de Début</strong>
+                                 <p>{{ evenement.dateDebut }}</p>
+                              </div>
+                           </div>
+                           
+                           <div class="detail-item">
+                              <i class="feather-icon icon-calendar"></i>
+                              <div>
+                                 <strong>Date de Fin</strong>
+                                 <p>{{ evenement.dateFin }}</p>
+                              </div>
+                           </div>
+                           
+                           <div class="detail-item">
+                              <i class="feather-icon icon-map-pin"></i>
+                              <div>
+                                 <strong>Lieu</strong>
+                                 <p>{{ evenement.lieu }}</p>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <!-- Description Section -->
+                     <div class="inner-sec" id="description">
+                        <h2 class="display-4 fw-bold">Description Complète</h2>
+                        <div class="description-content">
+                           <div class="bg-light p-4 rounded-3">
+                              <p class="fs-5 mb-0">{{ evenement.description }}</p>
+                           </div>
+                           
+                           <!-- Informations supplémentaires selon le type d'événement -->
+                           <div class="mt-4">
+                              {% if evenement.typeEvenement == 'Hackathon' %}
+                              <div class="about-content">
+                                 <h4 class="display-5 text-primary">Qu'est-ce qu'un Hackathon ?</h4>
+                                 <p>Un hackathon est un événement collaboratif où développeurs, designers, entrepreneurs et experts se réunissent pour travailler intensivement sur des projets innovants. Pendant 24 à 48 heures, les participants forment des équipes et créent des prototypes fonctionnels pour résoudre des défis spécifiques.</p>
+                                 
+                                 <h5 class="mt-4">Avantages d'un Hackathon :</h5>
+                                 <ul class="benefits-list">
+                                    <li><i class="feather-icon icon-zap text-warning me-2"></i><strong>Innovation rapide</strong> - Prototypage accéléré</li>
+                                    <li><i class="feather-icon icon-users text-success me-2"></i><strong>Réseautage</strong> - Rencontrez des passionnés</li>
+                                    <li><i class="feather-icon icon-award text-info me-2"></i><strong>Apprentissage</strong> - Nouvelles technologies</li>
+                                    <li><i class="feather-icon icon-briefcase text-primary me-2"></i><strong>Opportunités</strong> - Découverte de talents</li>
+                                 </ul>
+                              </div>
+                              
+                              {% elif evenement.typeEvenement == 'Workshop' %}
+                              <div class="about-content">
+                                 <h4 class="display-5 text-primary">Ateliers Pratiques</h4>
+                                 <p>Nos ateliers sont conçus pour offrir une expérience d'apprentissage pratique et immersive. Contrairement aux formations théoriques, nos ateliers mettent l'accent sur l'application immédiate des concepts enseignés.</p>
+                                 
+                                 <h5 class="mt-4">Ce que vous allez acquérir :</h5>
+                                 <ul class="benefits-list">
+                                    <li><i class="feather-icon icon-settings text-warning me-2"></i><strong>Compétences pratiques</strong> - Application directe</li>
+                                    <li><i class="feather-icon icon-help-circle text-info me-2"></i><strong>Support expert</strong> - Accompagnement personnalisé</li>
+                                    <li><i class="feather-icon icon-file-text text-success me-2"></i><strong>Ressources</strong> - Documentation complète</li>
+                                    <li><i class="feather-icon icon-star text-primary me-2"></i><strong>Projet concret</strong> - Réalisation de mini-projet</li>
+                                 </ul>
+                              </div>
+                              
+                              {% else %}
+                              <div class="about-content">
+                                 <h4 class="display-5 text-primary">Événement Éducatif</h4>
+                                 <p>Cet événement est conçu pour offrir une expérience d'apprentissage enrichissante et collaborative. Que vous soyez débutant ou expert, vous trouverez des opportunités de croissance et de développement.</p>
+                                 
+                                 <h5 class="mt-4">Notre approche :</h5>
+                                 <ul class="benefits-list">
+                                    <li><i class="feather-icon icon-book-open text-warning me-2"></i><strong>Pédagogie active</strong> - Apprentissage par la pratique</li>
+                                    <li><i class="feather-icon icon-users text-info me-2"></i><strong>Collaboration</strong> - Travail d'équipe</li>
+                                    <li><i class="feather-icon icon-target text-success me-2"></i><strong>Objectifs clairs</strong> - Résultats concrets</li>
+                                    <li><i class="feather-icon icon-award text-primary me-2"></i><strong>Reconnaissance</strong> - Certificat de participation</li>
+                                 </ul>
+                              </div>
+                              {% endif %}
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </article>
+         </div>
+         
+         <!-- Sidebar -->
+         <div class="col-lg-4">
+            <aside class="sidebar sticky-top widget-top">
+               <div class="widget price-widget bg-white border p-3 rounded-3">
+                  <div class="course-preview mb-3">
+                     {% if evenement.image %}
+<img src="/media/{{ evenement.image }}" alt="{{ evenement.nomEvenement }}" class="img-fluid rounded-2 w-100" style="height: 200px; object-fit: cover;">
+                     {% else %}
+                        <div class="bg-secondary rounded-2 d-flex align-items-center justify-content-center" style="height: 200px;">
+                           <div class="text-center text-white">
+                              <i class="feather-icon icon-calendar display-4"></i>
+                              <p class="mt-2 mb-0">Aucune image</p>
+                           </div>
+                        </div>
+                     {% endif %}
+                  </div>
+                  
+                  <div class="d-flex justify-content-between align-items-center">
+                     <h3 class="display-4 text-primary">{{ evenement.typeEvenement }}</h3>
+                     {% now "Y-m-d" as current_date %}
+                     {% if evenement.dateFin >= current_date %}
+                        <span class="badge bg-success"><i class="feather-icon icon-clock me-1"></i>À venir</span>
+                     {% else %}
+                        <span class="badge bg-secondary"><i class="feather-icon icon-check me-1"></i>Terminé</span>
+                     {% endif %}
+                  </div>
+                  
+                  <!-- Actions -->
+                <!-- Actions -->
+<div class="btn-cta mt-4">
+    {% now "Y-m-d" as current_date %}
+    {% if evenement.dateFin >= current_date %}
+        {% if request.session.user_uri %}
+            {% if deja_participe %}
+                <button class="btn btn-success rounded-2 w-100" disabled>
+                    <i class="feather-icon icon-check me-1"></i>Déjà participant
+                </button>
+               
+            {% else %}
+                <a href="{% url 'evenement:participer_evenement' evenement.uri %}" class="btn btn-primary">
+    Participer
+</a>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'person:sign_in' %}" class="btn btn-warning rounded-2 w-100">
+                <i class="feather-icon icon-log-in me-1"></i>Se connecter pour participer
+            </a>
+        {% endif %}
+    {% else %}
+        <button class="btn btn-secondary rounded-2 w-100" disabled>
+            <i class="feather-icon icon-calendar me-1"></i>Événement terminé
+        </button>
+    {% endif %}
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('participerBtn');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            // Afficher alerte
+            alert('Vous participez maintenant à cet événement !');
+
+            // Transformer le bouton en "Déjà participant"
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-success');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="feather-icon icon-check me-1"></i>Déjà participant';
+
+            // Ajouter lien vers mes participations
+            const parent = btn.parentNode;
+            const link = document.createElement('a');
+            link.href = "{% url 'evenement:mes_participations' %}";
+            link.className = "btn btn-outline-primary btn-sm w-100 mt-2";
+            link.innerHTML = '<i class="feather-icon icon-list me-1"></i>Voir mes participations';
+            parent.appendChild(link);
+        });
+    }
+});
+</script>
+
+                  
+                  <div class="price-widget-inner mt-4">
+                     <ul>
+                        <li><i class="feather-icon icon-calendar text-primary"></i>Date début <span>{{ evenement.dateDebut }}</span></li>
+                        <li><i class="feather-icon icon-calendar text-primary"></i>Date fin <span>{{ evenement.dateFin }}</span></li>
+                        <li><i class="feather-icon icon-map-pin text-primary"></i>Lieu <span>{{ evenement.lieu }}</span></li>
+                        <li><i class="feather-icon icon-tag text-primary"></i>Type <span>{{ evenement.typeEvenement }}</span></li>
+                     </ul>
+                  </div>
+                  
+                  <div class="card bg-shade p-3 text-center mt-4">
+                     <h6>Partager cet événement</h6>
+                     <div class="social-share white my-3 border-bottom pb-3">
+                        <a href="#"><i class="feather-icon icon-facebook"></i></a>
+                        <a href="#"><i class="feather-icon icon-linkedin"></i></a>
+                        <a href="#"><i class="feather-icon icon-twitter"></i></a>
+                        <a href="#"><i class="feather-icon icon-instagram"></i></a>
+                     </div>
+                     
+                     <!-- Actions d'administration -->
+                     <div class="admin-actions mt-3">
+                        <a href="{% url 'evenement:evenement_update' %}?uri={{ evenement.uri|urlencode }}" class="btn btn-warning btn-sm w-100 mb-2">
+                           <i class="feather-icon icon-edit me-1"></i>Modifier l'événement
+                        </a>
+                        <a href="{% url 'evenement:evenement_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                           <i class="feather-icon icon-arrow-left me-1"></i>Retour aux événements
+                        </a>
+                     </div>
+                  </div>
+               </div>
+            </aside>
+         </div>
+      </div>
+   </div>
+</section>
+<!-- Event Details End -->
+
+<!-- Newsletter Section Start -->
+<section class="newsletter bg-primary py-5">
+   <div class="container">
+      <div class="row align-items-center">
+         <div class="col-lg-8 mb-4 mb-lg-0">
+            <span class="badge bg-white text-primary rounded-pill px-3 py-2 mb-3 d-inline-block">Restez Informé</span>
+            <h2 class="display-5 fw-bold text-white mb-3">Abonnez-vous à notre <span class="text-warning">Newsletter</span></h2>
+            <p class="text-white-50 mb-0">Ne manquez aucun de nos événements exclusifs</p>
+         </div>
+         <div class="col-lg-4">
+            <div class="newsletter-form">
+               <form action="#">
+                  <div class="input-group">
+                     <input class="form-control rounded-pill border-0 py-3" type="email" placeholder="Adresse Email">
+                     <button class="btn btn-warning rounded-pill px-4 ms-2">
+                        <i class="feather-icon icon-send"></i>
+                     </button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+</section>
+
+<style>
+.promo-sec2 {
+   background: linear-gradient(135deg, rgba(99,102,241,.95) 0%, rgba(139,92,246,.95) 100%);
+   padding: 80px 0 60px;
+   color: white;
+}
+
+.course-intro h1 {
+   font-size: 2.5rem;
+   font-weight: 700;
+   margin-bottom: 1rem;
+}
+
+.course-intro .lead {
+   font-size: 1.2rem;
+   opacity: 0.9;
+   margin-bottom: 1.5rem;
+}
+
+/* Main image in large format */
+.event-hero-image {
+   position: relative;
+   overflow: hidden;
+}
+
+.event-main-image {
+   transition: transform 0.3s ease;
+}
+
+.event-hero-image:hover .event-main-image {
+   transform: scale(1.02);
+}
+
+.event-details-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+   gap: 1.5rem;
+   margin-top: 2rem;
+}
+
+.detail-item {
+   display: flex;
+   align-items: flex-start;
+   gap: 1rem;
+   padding: 1.5rem;
+   background: #f8f9fa;
+   border-radius: 12px;
+   border-left: 4px solid #6366f1;
+   transition: transform 0.2s ease;
+}
+
+.detail-item:hover {
+   transform: translateY(-2px);
+}
+
+.detail-item i {
+   font-size: 1.5rem;
+   color: #6366f1;
+   margin-top: 0.25rem;
+}
+
+.detail-item strong {
+   display: block;
+   margin-bottom: 0.5rem;
+   color: #2c3e50;
+}
+
+.detail-item p {
+   margin: 0;
+   color: #6c757d;
+}
+
+.info-card {
+   border-left: 4px solid #6366f1;
+   transition: all 0.3s ease;
+}
+
+.info-card:hover {
+   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.description-content {
+   background: #f8f9fa;
+   padding: 2rem;
+   border-radius: 12px;
+}
+
+.about-content {
+   line-height: 1.7;
+}
+
+.benefits-list {
+   list-style: none;
+   padding: 0;
+}
+
+.benefits-list li {
+   padding: 0.5rem 0;
+   border-bottom: 1px solid #e9ecef;
+}
+
+.benefits-list li:last-child {
+   border-bottom: none;
+}
+
+.benefits-list i {
+   width: 20px;
+}
+
+.nav-pills .nav-link {
+   color: #6c757d;
+   font-weight: 500;
+   padding: 1rem 1.5rem;
+   transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+   background: #6366f1;
+   color: white;
+}
+
+.nav-pills .nav-link i {
+   margin-right: 0.5rem;
+}
+
+.price-widget-inner ul {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+
+.price-widget-inner li {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 0.75rem 0;
+   border-bottom: 1px solid #e9ecef;
+}
+
+.price-widget-inner li:last-child {
+   border-bottom: none;
+}
+
+.price-widget-inner li i {
+   color: #6366f1;
+   margin-right: 0.5rem;
+}
+
+.social-share a {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: 40px;
+   height: 40px;
+   background: #6366f1;
+   color: white;
+   border-radius: 50%;
+   margin: 0 0.25rem;
+   text-decoration: none;
+   transition: all 0.3s ease;
+}
+
+.social-share a:hover {
+   background: #4f46e5;
+   transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+   .course-intro h1 {
+      font-size: 2rem;
+   }
+   
+   .event-details-grid {
+      grid-template-columns: 1fr;
+   }
+   
+   .detail-item {
+      padding: 1rem;
+   }
+   
+   .event-main-image {
+      max-height: 300px;
+   }
+}
+</style>
+
+{% include 'trelix_app/footer.html' %}
+{% endblock %}

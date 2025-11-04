@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(120deg, #4e73df, #1cc88a);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            border-radius: 15px;
+            animation: fadeIn .7s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        label {
+            font-weight: 600;
+        }
+        .btn-custom {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" style="max-width: 550px;">
+    <div class="card shadow-lg p-4">
+
+        <h3 class="text-center mb-4 text-primary">{{ title }}</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Nom -->
+            <div class="mb-3">
+                {{ form.nom.label_tag }}
+                {{ form.nom }}
+            </div>
+
+            <!-- ✅ Description + Micro + Choix de Langue -->
+            <div class="mb-3">
+                {{ form.description.label_tag }}
+
+                <!-- Choix Langue IA -->
+                <select id="langSelect" class="form-select mb-2">
+                    <option value="fr-FR">🇫🇷 Français</option>
+                    <option value="en-US">🇺🇸 English</option>
+                    <option value="es-ES">🇪🇸 Español</option>
+                    <option value="ar-MA">🇲🇦 العربية</option>
+                </select>
+
+                <!-- Description + Micro -->
+                <div class="input-group">
+                    {{ form.description }}
+                    <button type="button" id="btnSpeak" class="btn btn-danger ms-2">🎤</button>
+                </div>
+
+                <small id="speechStatus" class="text-light"></small>
+            </div>
+
+            <!-- Date Examen -->
+            <div class="form-floating mb-3">
+                {{ form.date_examen }}
+                <label for="{{ form.date_examen.id_for_label }}">Date de l'examen</label>
+            </div>
+
+            <!-- Note Max -->
+            <div class="mb-4">
+                {{ form.note_max.label_tag }}
+                {{ form.note_max }}
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-success btn-custom">💾 Enregistrer</button>
+                <a href="/api/examens/" class="btn btn-danger btn-custom">↩ Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- ✅ SCRIPT IA multilingue -->
+<script>
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = "fr-FR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    const btn = document.getElementById("btnSpeak");
+    const descInput = document.getElementById("id_description");
+    const statusText = document.getElementById("speechStatus");
+    const langSelect = document.getElementById("langSelect");
+
+    langSelect.addEventListener("change", () => {
+        recognition.lang = langSelect.value;
+    });
+
+    btn.addEventListener("click", () => {
+        recognition.start();
+        statusText.innerText = "🎤 Parlez... (" + recognition.lang + ")";
+        btn.classList.remove("btn-danger");
+        btn.classList.add("btn-warning");
+    });
+
+    recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        descInput.value += (descInput.value ? " " : "") + text;
+        statusText.innerText = "✅ Texte détecté : " + text;
+        btn.classList.remove("btn-warning");
+        btn.classList.add("btn-success");
+    };
+
+    recognition.onerror = () => {
+        statusText.innerText = "❌ Erreur reconnaissance";
+        btn.classList.remove("btn-warning");
+        btn.classList.add("btn-danger");
+    };
+
+    recognition.onend = () => {
+        btn.classList.remove("btn-warning");
+        btn.classList.add("btn-danger");
+    };
+
+} else {
+    alert("❌ Web Speech API non supportée ! Essayez Chrome/Edge.");
+}
+</script>
+
+</body>
+</html>

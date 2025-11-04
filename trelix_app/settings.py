@@ -12,10 +12,21 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+
+
+load_dotenv()
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY')  # Remplacez par votre clé réelle
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -47,6 +58,14 @@ INSTALLED_APPS = [
     'trelix_app',
     'leaderboared',
     'goal',
+     'rest_framework',
+    'evaluation',
+    'activity',
+    'person',
+    'module',
+    'produit',
+    'evenement',
+    'preference',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +74,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'person.middleware.SPARQLPersonAuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -136,3 +156,23 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
+
+
+# NLP Cloud
+NLP_CLOUD_API_KEY = os.getenv('NLP_CLOUD_API_KEY')
+NLP_CLOUD_MODEL = os.getenv('NLP_CLOUD_MODEL')
+
+# HUGGINGFACE API TOKEN
+HF_API_TOKEN=os.getenv('HF_API_TOKEN')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# GOOGLE API KEY
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+GEMINI_MODEL_NAME = os.getenv('GEMINI_MODEL_NAME')

@@ -1,0 +1,366 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Produits{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+
+<!-- Enhanced Promo Section -->
+{% get_static_prefix as STATIC_PREFIX %}
+<section class="promo-sec position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%), url('{{ STATIC_PREFIX }}images/promo-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding: 80px 0;">
+  <img src="{% static 'images/promo-left.png' %}" alt="" class="anim-img" style="opacity: 0.6;">
+  <img src="{% static 'images/promo-right.png' %}" alt="" class="anim-img anim-right" style="opacity: 0.6;">
+  <div class="container position-relative" style="z-index: 10;">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="display-2 text-white fw-bold mb-3" style="text-shadow: 0 2px 20px rgba(0,0,0,0.2);">Produits</h1>
+        <p class="text-white-50 fs-5 mb-4">Découvrez et gérez vos produits</p>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-center" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 50px; padding: 12px 24px; display: inline-flex;">
+            <li class="breadcrumb-item"><a href="/" class="text-white text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item text-white-50" aria-current="page">Produits</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced Produits Section -->
+<section class="produits-sec sec-padding" style="background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%); padding: 60px 0;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <!-- Search and Filter Bar -->
+        <div class="mb-5 p-4 bg-white rounded-3 shadow-sm">
+          <div class="row align-items-center g-3">
+            <div class="col-lg-6 col-md-12">
+              <div class="input-group input-group-lg">
+                <span class="input-group-text bg-transparent border-end-0">
+                  <i class="feather-icon icon-search"></i>
+                </span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Rechercher des produits..." id="produitSearch" style="box-shadow: none;">
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+              <div class="d-flex align-items-center justify-content-lg-end gap-3">
+                <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                  <i class="feather-icon icon-package me-2"></i>
+                  <span id="produitCount">{{ produits|length }}</span> Produits
+                </span>
+                <a href="{% url 'produit_create' %}" class="btn btn-lg px-4" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; border-radius: 12px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
+                  <i class="feather-icon icon-plus-circle me-2"></i>
+                  <span>Ajouter Produit</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="produits-container" class="produit-lists row g-4">
+          {% for produit in produits %}
+          <div class="col-xl-4 col-lg-6 col-md-6 produit-item" data-produit-name="{{ produit.nomPack|lower }}" data-produit-desc="{{ produit.description|lower }}">
+            <div class="produit-entry-3 card h-100 border-0 shadow-sm position-relative overflow-hidden" style="transition: all 0.3s ease; border-radius: 16px;">
+              <!-- Decorative gradient bar -->
+              <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);"></div>
+              
+              <div class="card-body p-4 d-flex flex-column">
+                <!-- Product Icon -->
+                <div class="mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 12px;">
+                  <i class="feather-icon icon-package text-white" style="font-size: 1.5rem;"></i>
+                </div>
+
+                <!-- Product Header -->
+                <div class="mb-3">
+                  <h3 class="sub-title mb-2 fw-bold" style="color: #1e293b; font-size: 1.25rem; line-height: 1.4;">{{ produit.nomPack }}</h3>
+                  <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">{{ produit.description|truncatewords:20 }}</p>
+                </div>
+
+                <!-- Price Badge -->
+                <div class="mb-3">
+                  <span class="badge px-4 py-2" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 1rem; border-radius: 10px; font-weight: 600;">
+                    <i class="feather-icon icon-dollar-sign me-1"></i>{{ produit.valeurMonetaire }} €
+                  </span>
+                </div>
+
+                <!-- Product Footer -->
+                <div class="produit-footer mt-auto pt-3" style="border-top: 1px solid #f1f5f9;">
+                  <div class="d-flex gap-2 mb-2">
+                    <a href="{% url 'produit_update' %}?uri={{ produit.uri }}" class="btn btn-outline-primary btn-sm flex-grow-1 d-flex align-items-center justify-content-center gap-1" style="border-radius: 10px; padding: 10px; font-weight: 500; transition: all 0.2s ease;">
+                      <i class="feather-icon icon-edit"></i>
+                      <span>Modifier</span>
+                    </a>
+                  </div>
+                  <button class="btn btn-outline-danger btn-sm w-100 delete-produit-btn d-flex align-items-center justify-content-center gap-2" data-uri="{{ produit.uri }}" data-produit-name="{{ produit.nomPack }}" style="border-radius: 10px; padding: 10px; font-weight: 500; transition: all 0.2s ease;">
+                    <i class="feather-icon icon-trash-2"></i>
+                    <span>Supprimer Produit</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hover effect overlay -->
+              <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary" style="opacity: 0; transition: opacity 0.3s ease; pointer-events: none; mix-blend-mode: soft-light;"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="text-center py-5 d-none">
+          <div class="mb-4">
+            <i class="feather-icon icon-inbox" style="font-size: 4rem; color: #cbd5e1;"></i>
+          </div>
+          <h4 class="text-muted mb-2">Aucun produit trouvé</h4>
+          <p class="text-muted">Essayez d'ajuster vos termes de recherche</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include 'trelix_app/footer.html' %}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      <div class="modal-header border-0" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 30px;">
+        <div>
+          <h5 class="modal-title text-white fw-bold fs-4 mb-2" id="deleteModalLabel">
+            <i class="feather-icon icon-alert-triangle me-2"></i>Supprimer le Produit
+          </h5>
+          <p class="text-white-50 mb-0">Cette action est irréversible</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="mb-3">Êtes-vous sûr de vouloir supprimer le produit :</p>
+        <div class="alert alert-light border d-flex align-items-center" style="border-radius: 12px;">
+          <i class="feather-icon icon-package text-danger me-3 fs-4"></i>
+          <strong id="deleteProduitName" class="text-dark"></strong>
+        </div>
+        <p class="text-muted small mb-0">Toutes les données associées seront définitivement supprimées.</p>
+      </div>
+      <div class="modal-footer border-0 bg-light p-4">
+        <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal" style="border-radius: 12px;">Annuler</button>
+        <button type="button" class="btn btn-danger btn-lg px-4" id="confirmDeleteBtn" style="border-radius: 12px; font-weight: 500;">
+          <i class="feather-icon icon-trash-2 me-2"></i>Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Enhanced Card Hover Effects */
+.produit-entry-3:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15) !important;
+}
+
+.produit-entry-3:hover .position-absolute.bg-primary {
+    opacity: 0.02 !important;
+}
+
+/* Button Hover Effects */
+.btn-outline-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-sm[style*="background: linear-gradient"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    opacity: 0.95;
+}
+
+.delete-produit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background-color: #fee2e2 !important;
+}
+
+.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Search Input Focus */
+#produitSearch:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Animation for produit cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+.produit-item {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.produit-item:nth-child(1) { animation-delay: 0.05s; }
+.produit-item:nth-child(2) { animation-delay: 0.1s; }
+.produit-item:nth-child(3) { animation-delay: 0.15s; }
+.produit-item:nth-child(4) { animation-delay: 0.2s; }
+.produit-item:nth-child(5) { animation-delay: 0.25s; }
+.produit-item:nth-child(6) { animation-delay: 0.3s; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .promo-sec {
+        padding: 60px 0 !important;
+    }
+    
+    .display-2 {
+        font-size: 2.5rem !important;
+    }
+    
+    .produit-footer .d-flex.gap-2 {
+        flex-direction: column !important;
+    }
+}
+</style>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Search functionality
+    const searchInput = document.getElementById('produitSearch');
+    const produitItems = document.querySelectorAll('.produit-item');
+    const produitCount = document.getElementById('produitCount');
+    const emptyState = document.getElementById('emptyState');
+    const produitsContainer = document.getElementById('produits-container');
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        let visibleCount = 0;
+
+        produitItems.forEach(item => {
+            const produitName = item.dataset.produitName;
+            const produitDesc = item.dataset.produitDesc;
+            
+            if (produitName.includes(searchTerm) || produitDesc.includes(searchTerm)) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        produitCount.textContent = visibleCount;
+        
+        if (visibleCount === 0) {
+            emptyState.classList.remove('d-none');
+            produitsContainer.classList.add('d-none');
+        } else {
+            emptyState.classList.add('d-none');
+            produitsContainer.classList.remove('d-none');
+        }
+    });
+
+    // Delete functionality
+    const deleteButtons = document.querySelectorAll(".delete-produit-btn");
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteProduitName = document.getElementById('deleteProduitName');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    let currentDeleteUri = null;
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            currentDeleteUri = btn.dataset.uri;
+            deleteProduitName.textContent = btn.dataset.produitName;
+            deleteModal.show();
+        });
+    });
+
+    confirmDeleteBtn.addEventListener("click", () => {
+        if (!currentDeleteUri) return;
+
+        // Show loading state
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Suppression...';
+
+        fetch(`/produits/delete/?uri=${encodeURIComponent(currentDeleteUri)}`, {
+            method: 'GET',
+            headers: { 
+                "X-CSRFToken": getCookie("csrftoken")
+            }
+        })
+        .then(res => {
+            // Remove the produit card from DOM
+            const produitCard = document.querySelector(`.delete-produit-btn[data-uri="${currentDeleteUri}"]`).closest('.produit-item');
+            produitCard.style.animation = 'fadeOut 0.3s ease forwards';
+            
+            setTimeout(() => {
+                produitCard.remove();
+                // Update count
+                const remainingProduits = document.querySelectorAll('.produit-item:not([style*="display: none"])').length;
+                produitCount.textContent = remainingProduits;
+                
+                // Show empty state if no produits left
+                if (remainingProduits === 0) {
+                    emptyState.classList.remove('d-none');
+                    produitsContainer.classList.add('d-none');
+                }
+            }, 300);
+
+            deleteModal.hide();
+            
+            // Show success message
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            successAlert.style.zIndex = '9999';
+            successAlert.innerHTML = `
+                <i class="feather-icon icon-check-circle me-2"></i>
+                Produit supprimé avec succès!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(successAlert);
+            setTimeout(() => successAlert.remove(), 3000);
+        })
+        .catch(err => {
+            console.error("Error deleting produit:", err);
+            alert("Erreur lors de la suppression du produit");
+        })
+        .finally(() => {
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.innerHTML = '<i class="feather-icon icon-trash-2 me-2"></i>Supprimer';
+            currentDeleteUri = null;
+        });
+    });
+});
+</script>
+{% endblock %}
