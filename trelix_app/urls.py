@@ -16,6 +16,7 @@ urlpatterns = [
     path("preferences/", include("preference.urls")),
     path('activity/', include('activity.urls')),
     path('person/', include('person.urls')),
+    path('api/', include('evaluation.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+     'rest_framework',
+    'evaluation',
     'trelix_app',
     'activity',
     'person',
@@ -144,6 +146,13 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
+
+
 # NLP Cloud
 NLP_CLOUD_API_KEY = os.getenv('NLP_CLOUD_API_KEY')
 NLP_CLOUD_MODEL = os.getenv('NLP_CLOUD_MODEL')

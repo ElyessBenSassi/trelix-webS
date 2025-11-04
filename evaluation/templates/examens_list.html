@@ -1,0 +1,119 @@
+
+{% extends "trelix_app/base.html" %} 
+{% load static %}
+{% block title %} Evaluation {% endblock %} 
+{% block content %}
+{% include 'trelix_app/header.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des examens</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+       
+        .card { animation: fadeIn .7s; border-radius: 15px; }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: none;} }
+        th, td { text-align: center; vertical-align: middle; }
+        .badge-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card shadow-lg p-4">
+
+        <h2 class="text-center text-primary mb-4">📘 Gestion des Examens</h2>
+
+        <!-- ✅ Formulaire de recherche -->
+        <form method="GET" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Rechercher..."
+                       value="{{ search }}">
+                <button class="btn btn-dark">🔍</button>
+            </div>
+        </form>
+
+        <div class="text-end mb-3">
+            <a href="/api/examens/ajouter/" class="btn btn-success">➕ Ajouter un examen</a>
+        </div>
+
+        <table class="table table-hover table-striped align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+
+                <!-- ✅ Tri par nom -->
+                <th>
+                    Nom
+                    <a href="?order=nom&search={{ search }}">▲</a>
+                    <a href="?order=-nom&search={{ search }}">▼</a>
+                </th>
+
+                <!-- ✅ Tri par date -->
+                <th>
+                    Date
+                    <a href="?order=date_examen&search={{ search }}">▲</a>
+                    <a href="?order=-date_examen&search={{ search }}">▼</a>
+                </th>
+
+                <!-- ✅ Tri par note -->
+                <th>
+                    Note max
+                    <a href="?order=note_max&search={{ search }}">▲</a>
+                    <a href="?order=-note_max&search={{ search }}">▼</a>
+                </th>
+
+                <th>Description</th>
+                <th>Badge</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for examen in examens %}
+                <tr>
+                    <td>{{ examen.id }}</td>
+                    <td class="text-start fw-semibold">{{ examen.nom }}</td>
+                    <td>{{ examen.date_examen|date:"d/m/Y" }}</td>
+                    <td>{{ examen.note_max }}</td>
+                    <td class="text-start">{{ examen.description|default:"—" }}</td>
+
+                    <td>
+                        {% if examen.badge and examen.badge.image %}
+                            <img src="{{ examen.badge.image.url }}" class="badge-img" alt="badge">
+                        {% else %}
+                            {{ examen.badge.type|default:"—" }}
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <a href="/api/examens/modifier/{{ examen.id }}/" class="btn btn-primary btn-sm me-1">✏ Modifier</a>
+                        <a href="/api/examens/supprimer/{{ examen.id }}/"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Voulez-vous vraiment supprimer cet examen ?')">🗑 Supprimer</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr class="bg-danger bg-opacity-25">
+                    <td colspan="7" class="text-center text-danger fw-bold">Aucun examen trouvé 😕</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+</body>
+</html>
+{% include 'trelix_app/footer.html' %}
+{% endblock %}
