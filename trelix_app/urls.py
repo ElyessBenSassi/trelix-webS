@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
 from .views import classes_html_view
-from . import views  # ✅ importer views
+from . import views 
+from django.conf import settings
+from django.conf.urls.static import static 
 
 
 urlpatterns = [
@@ -15,3 +17,5 @@ urlpatterns = [
     path('activity/', include('activity.urls')),
     path('person/', include('person.urls')),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

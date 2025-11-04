@@ -1,0 +1,509 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Événements - Trelix{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+
+<!-- Promo Section Start -->
+<section class="promo-sec position-relative overflow-hidden"
+ style="background: linear-gradient(135deg, rgba(99,102,241,.95) 0%, rgba(139,92,246,.95) 100%); padding:80px 0 60px;">
+   <div class="container">
+      <div class="row">
+         <div class="col-lg-12 text-center">
+            <h1 class="display-4 text-white fw-bold mb-3">📅 Nos Événements</h1>
+            <nav aria-label="breadcrumb mt-0">
+               <ol class="breadcrumb justify-content-center">
+                  <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50">Accueil</a></li>
+                  <li class="breadcrumb-item active text-white" aria-current="page">Événements</li>
+               </ol>
+            </nav>
+         </div>
+      </div>
+   </div>
+</section>
+<!-- Promo Section End -->
+
+<!-- Event Section Start -->
+<div class="event-main sec-padding bg-light">
+   <div class="container">
+      <!-- Header avec bouton d'ajout -->
+      <div class="row mb-5">
+         <div class="col-lg-8">
+            <h2 class="display-6 fw-bold text-dark mb-3">Découvrez nos prochains événements</h2>
+            <p class="text-muted fs-5">Participez à des expériences uniques et enrichissantes</p>
+         </div>
+         <div class="col-lg-4 text-lg-end">
+            <a href="{% url 'evenement:evenement_create' %}" class="btn btn-primary btn-lg rounded-pill px-4">
+               <i class="feather-icon icon-plus me-2"></i>Créer un événement
+            </a>
+         </div>
+      </div>
+
+      <!-- Grid des événements -->
+      <div class="row g-4">
+         {% for e in evenements %}
+         <div class="col-xl-4 col-md-6">
+            <div class="event-entry shadow-sm overflow-hidden rounded-4 h-100">
+               <div class="event-thumb position-relative">
+               {% if e.image %}
+    <img class="img-fluid w-100" src="/media/{{ e.image }}" alt="{{ e.nomEvenement }}">
+{% else %}
+    <img class="img-fluid w-100" src="{% static 'images/event-default.jpg' %}" alt="{{ e.nomEvenement }}">
+{% endif %}
+
+                  <div class="event-type-badge position-absolute top-0 end-0 m-3">
+                     <span class="badge bg-primary rounded-pill px-3 py-2">{{ e.typeEvenement }}</span>
+                  </div>
+                  <!-- Badge de statut sur l'image -->
+                  <div class="event-status-badge position-absolute top-0 start-0 m-3">
+                     {% now "Y-m-d" as current_date %}
+                     {% if e.dateFin >= current_date %}
+                     <span class="badge bg-success rounded-pill px-3 py-2">
+                        <i class="feather-icon icon-clock me-1"></i>À venir
+                     </span>
+                     {% else %}
+                     <span class="badge bg-secondary rounded-pill px-3 py-2">
+                        <i class="feather-icon icon-check me-1"></i>Terminé
+                     </span>
+                     {% endif %}
+                  </div>
+               </div>
+               
+               <div class="entry-content p-4 d-flex flex-column h-100">
+                  <!-- Nom de l'événement en grand -->
+                  <h2 class="event-title fw-bold mb-3 text-center">
+                     {{ e.nomEvenement }}
+                  </h2>
+
+                  <!-- Dates Début et Fin -->
+                  <div class="date-section mb-4">
+                     <div class="row g-2 text-center">
+                        <div class="col-6">
+                           <div class="date-info">
+                              <div class="date-label text-muted small mb-1">Début</div>
+                              <div class="date-value fw-bold text-primary">
+                                 {{ e.dateDebut }}
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-6">
+                           <div class="date-info">
+                              <div class="date-label text-muted small mb-1">Fin</div>
+                              <div class="date-value fw-bold text-warning">
+                                 {{ e.dateFin }}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <!-- Lieu et Type -->
+                  <div class="event-meta mb-4">
+                     <div class="row g-3 text-center">
+                        <div class="col-12">
+                           <span class="d-flex align-items-center justify-content-center text-muted fw-semibold">
+                              <i class="feather-icon icon-map-pin me-2 text-primary"></i>
+                              {{ e.lieu }}
+                           </span>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="event-footer d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                     <!-- Participants ou autre info -->
+ 
+                     
+                     <!-- Boutons d'action -->
+                     <div class="action-buttons">
+                         <a href="{% url 'evenement:evenement_update' %}?uri={{ e.uri }}" class="btn btn-outline-primary btn-sm rounded-pill me-1">
+                            <i class="feather-icon icon-edit"></i>
+                         </a>
+                         <a href="{% url 'evenement:evenement_delete' %}?uri={{ e.uri }}" class="btn btn-outline-danger btn-sm rounded-pill">
+                            <i class="feather-icon icon-trash"></i>
+                         </a>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         {% empty %}
+         <div class="col-12">
+            <div class="text-center py-5">
+               <div class="empty-state-icon mb-4">
+                  <i class="feather-icon icon-calendar display-1 text-muted"></i>
+               </div>
+               <h3 class="text-muted mb-3">Aucun événement disponible</h3>
+               <p class="text-muted mb-4">Revenez plus tard pour découvrir nos prochains événements.</p>
+               <a href="{% url 'evenement:evenement_create' %}" class="btn btn-primary btn-lg rounded-pill">
+                  <i class="feather-icon icon-plus me-2"></i>Créer le premier événement
+               </a>
+            </div>
+         </div>
+         {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if evenements.has_other_pages %}
+      <div class="row mt-5">
+         <div class="col-lg-12">
+            <div class="pager text-center">
+               {% if evenements.has_previous %}
+               <a href="?page={{ evenements.previous_page_number }}" class="next-btn rounded-circle"> 
+                  <i class="feather-icon icon-arrow-left"></i>
+               </a>
+               {% endif %}
+               
+               {% for i in evenements.paginator.page_range %}
+                  {% if evenements.number == i %}
+                  <span class="current rounded-circle">{{ i }}</span>
+                  {% else %}
+                  <a href="?page={{ i }}" class="rounded-circle">{{ i }}</a>
+                  {% endif %}
+               {% endfor %}
+               
+               {% if evenements.has_next %}
+               <a href="?page={{ evenements.next_page_number }}" class="prev-btn rounded-circle"> 
+                  <i class="feather-icon icon-arrow-right"></i>
+               </a>
+               {% endif %}
+            </div>
+         </div>
+      </div>
+      {% endif %}
+   </div>
+</div>
+<!-- Event Section End -->
+
+<!-- Newsletter Section Start -->
+<section class="newsletter bg-primary py-5">
+   <div class="container">
+      <div class="row align-items-center">
+         <div class="col-lg-8 mb-4 mb-lg-0">
+            <span class="badge bg-white text-primary rounded-pill px-3 py-2 mb-3 d-inline-block">Restez Informé</span>
+            <h2 class="display-5 fw-bold text-white mb-3">Abonnez-vous à notre <span class="text-warning">Newsletter</span></h2>
+            <p class="text-white-50 mb-0">Ne manquez aucun de nos événements exclusifs</p>
+         </div>
+         <div class="col-lg-4">
+            <div class="newsletter-form">
+               <form action="#">
+                  <div class="input-group">
+                     <input class="form-control rounded-pill border-0 py-3" type="email" placeholder="Adresse Email">
+                     <button class="btn btn-warning rounded-pill px-4 ms-2">
+                        <i class="feather-icon icon-send"></i>
+                     </button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+</section>
+<!-- Newsletter Section End -->
+
+<style>
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary-color: #6c757d;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --border-color: #e9ecef;
+  --shadow-light: 0 2px 15px rgba(0,0,0,0.08);
+  --shadow-medium: 0 5px 25px rgba(0,0,0,0.1);
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.event-entry {
+   background: white;
+   transition: all 0.3s ease;
+   border: 1px solid var(--border-color);
+   display: flex;
+   flex-direction: column;
+}
+
+.event-entry:hover {
+   transform: translateY(-8px);
+   box-shadow: var(--shadow-medium);
+   border-color: var(--primary-color);
+}
+
+.event-thumb {
+   overflow: hidden;
+   height: 200px;
+   position: relative;
+}
+
+.event-thumb img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   transition: transform 0.5s ease;
+}
+
+.event-entry:hover .event-thumb img {
+   transform: scale(1.1);
+}
+
+.event-type-badge .badge {
+   font-size: 0.75rem;
+   font-weight: 600;
+   text-transform: uppercase;
+   letter-spacing: 0.5px;
+}
+
+.event-status-badge .badge {
+   font-size: 0.7rem;
+   font-weight: 600;
+   letter-spacing: 0.5px;
+}
+
+/* Section Dates */
+.date-section {
+   margin: 0 0 1rem 0;
+}
+
+.date-info {
+   padding: 0.5rem;
+}
+
+.date-label {
+   font-weight: 500;
+   letter-spacing: 0.5px;
+}
+
+.date-value {
+   font-size: 0.9rem;
+   line-height: 1.2;
+}
+
+/* Nom d'événement en grand format */
+.event-title {
+   font-size: 1.5rem;
+   line-height: 1.3;
+   min-height: 3.5rem;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: #1e293b;
+   margin-bottom: 1rem;
+   text-align: center;
+   word-wrap: break-word;
+}
+
+/* Métadonnées */
+.event-meta {
+   font-size: 0.95rem;
+}
+
+.event-meta span {
+   display: flex;
+   align-items: center;
+}
+
+.entry-content {
+   background: white;
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+}
+
+.event-footer {
+   border-top: 1px solid var(--border-color);
+   padding-top: 1rem;
+   margin-top: auto;
+}
+
+.action-buttons .btn {
+   width: 36px;
+   height: 36px;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   padding: 0;
+   transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+   transform: scale(1.1);
+}
+
+.event-info .badge {
+   font-size: 0.75rem;
+   font-weight: 500;
+   padding: 6px 12px;
+   border: 1px solid var(--border-color);
+}
+
+/* Pagination */
+.pager {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   gap: 8px;
+}
+
+.pager a, .pager span {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: 45px;
+   height: 45px;
+   border-radius: 50%;
+   text-decoration: none;
+   font-weight: 600;
+   transition: all 0.3s ease;
+}
+
+.pager a {
+   background: white;
+   border: 2px solid var(--border-color);
+   color: var(--secondary-color);
+}
+
+.pager a:hover {
+   background: var(--primary-color);
+   border-color: var(--primary-color);
+   color: white;
+   transform: translateY(-2px);
+}
+
+.pager .current {
+   background: var(--primary-color);
+   color: white;
+   border: 2px solid var(--primary-color);
+}
+
+.sec-padding {
+   padding: 80px 0;
+}
+
+.empty-state-icon {
+   opacity: 0.7;
+}
+
+/* Effets de brillance sur les cartes */
+.event-entry::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: -100%;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+   );
+   transition: left 0.5s;
+   z-index: 1;
+}
+
+.event-entry:hover::before {
+   left: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+   .event-thumb {
+      height: 180px;
+   }
+   
+   .event-title {
+      font-size: 1.3rem;
+      min-height: 3.2rem;
+   }
+   
+   .date-value {
+      font-size: 0.85rem;
+   }
+   
+   .event-footer {
+      flex-direction: column;
+      gap: 15px;
+      text-align: center;
+   }
+   
+   .action-buttons {
+      width: 100%;
+      justify-content: center;
+   }
+   
+   .pager a, .pager span {
+      width: 40px;
+      height: 40px;
+      font-size: 0.9rem;
+   }
+}
+
+@media (max-width: 576px) {
+   .sec-padding {
+      padding: 60px 0;
+   }
+   
+   .event-thumb {
+      height: 160px;
+   }
+   
+   .entry-content {
+      padding: 1.5rem !important;
+   }
+   
+   .event-title {
+      font-size: 1.25rem;
+   }
+}
+
+/* Animation pour les cartes */
+@keyframes fadeInUp {
+   from {
+      opacity: 0;
+      transform: translateY(30px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+.event-entry {
+   animation: fadeInUp 0.6s ease forwards;
+}
+
+.event-entry:nth-child(1) { animation-delay: 0.1s; }
+.event-entry:nth-child(2) { animation-delay: 0.2s; }
+.event-entry:nth-child(3) { animation-delay: 0.3s; }
+.event-entry:nth-child(4) { animation-delay: 0.4s; }
+.event-entry:nth-child(5) { animation-delay: 0.5s; }
+.event-entry:nth-child(6) { animation-delay: 0.6s; }
+</style>
+
+<script>
+// Animation au scroll
+document.addEventListener('DOMContentLoaded', function() {
+   const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+   };
+
+   const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+         if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateY(0)";
+         }
+      });
+   }, observerOptions);
+
+   // Observer les cartes d'événements
+   document.querySelectorAll('.event-entry').forEach(card => {
+      card.style.opacity = "0";
+      card.style.transform = "translateY(30px)";
+      card.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+      observer.observe(card);
+   });
+});
+</script>
+
+{% include 'trelix_app/footer.html' %}
+{% endblock %}

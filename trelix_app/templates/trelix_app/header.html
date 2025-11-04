@@ -202,9 +202,20 @@
             <ul class="navbar-nav align-items-lg-center">
               <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
               <li class="nav-item"><a class="nav-link" href="/modules/">Modules</a></li>
+              <li class="nav-item"><a class="nav-link" href="/preferences/">Preferences</a></li>
+
               <li class="nav-item"><a class="nav-link" href="/produit/">Produit</a></li>
               <li class="nav-item"><a class="nav-link" href="#">Exams</a></li>
-              <li class="nav-item"><a class="nav-link" href="/evenements/create/">Evenement</a></li>
+              <li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="/evenements/create/" id="eventDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Evenement
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="eventDropdown">
+    <li><a class="dropdown-item" href="/evenements/create/">Ajout Evenement</a></li>
+    <li><a class="dropdown-item" href="/evenements/"> participation Evenement</a></li>
+
+  </ul>
+</li>
               <li class="nav-item"><a class="nav-link" href="#">Quiz</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'activity:activity_list' %}">Activities</a></li>
 

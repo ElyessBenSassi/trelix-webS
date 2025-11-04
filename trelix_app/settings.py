@@ -14,6 +14,13 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+
+
+load_dotenv()
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
@@ -143,6 +150,9 @@ NLP_CLOUD_MODEL = os.getenv('NLP_CLOUD_MODEL')
 
 # HUGGINGFACE API TOKEN
 HF_API_TOKEN=os.getenv('HF_API_TOKEN')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # GOOGLE API KEY
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
