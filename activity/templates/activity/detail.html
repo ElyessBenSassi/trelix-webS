@@ -132,6 +132,55 @@
                             </div>
                          </div>
                       </div>
+                      
+                      <div class="row mb-4">
+                         <div class="col-12">
+                            <button id="loadTipsBtn" class="btn btn-primary btn-lg w-100">
+                               <i class="feather-icon icon-zap"></i> Get Tips & Suggestions
+                            </button>
+                         </div>
+                      </div>
+                      
+                      <!-- Tips Section -->
+                      <div id="tipsSection" class="mb-4" style="display: none;">
+                         <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                               <h4 class="mb-0"><i class="feather-icon icon-lightbulb"></i> Activity Tips</h4>
+                            </div>
+                            <div class="card-body">
+                               <ul id="tipsList" class="list-unstyled mb-0">
+                                  <!-- Tips will be loaded here -->
+                               </ul>
+                            </div>
+                         </div>
+                      </div>
+                      
+                      <!-- Suggestions Section -->
+                      <div id="suggestionsSection" class="mb-4" style="display: none;">
+                         <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                               <h4 class="mb-0"><i class="feather-icon icon-grid"></i> Similar Activities</h4>
+                            </div>
+                            <div class="card-body">
+                               <div id="suggestionsGrid" class="row">
+                                  <!-- Suggestions will be loaded here -->
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                      
+                      <!-- Loading Indicator -->
+                      <div id="loadingIndicator" class="text-center mb-4" style="display: none;">
+                         <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                         </div>
+                         <p class="mt-2 text-muted">Generating tips and suggestions...</p>
+                      </div>
+                      
+                      <!-- Error Message -->
+                      <div id="errorMessage" class="alert alert-danger" style="display: none;" role="alert">
+                         <i class="feather-icon icon-alert-circle"></i> <span id="errorText"></span>
+                      </div>
                    </div>
                 </div>
              </div>
@@ -139,6 +188,114 @@
        </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loadBtn = document.getElementById('loadTipsBtn');
+    const tipsSection = document.getElementById('tipsSection');
+    const suggestionsSection = document.getElementById('suggestionsSection');
+    const tipsList = document.getElementById('tipsList');
+    const suggestionsGrid = document.getElementById('suggestionsGrid');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    
+    loadBtn.addEventListener('click', function() {
+        // Disable button and show loading
+        loadBtn.disabled = true;
+        loadBtn.innerHTML = '<i class="feather-icon icon-loader"></i> Loading...';
+        loadingIndicator.style.display = 'block';
+        tipsSection.style.display = 'none';
+        suggestionsSection.style.display = 'none';
+        errorMessage.style.display = 'none';
+        
+        // Make AJAX request
+        const tipsUrl = '{% url "activity:get_tips_and_suggestions" activity.uri %}';
+        fetch(tipsUrl)
+            .then(response => response.json())
+            .then(data => {
+                loadingIndicator.style.display = 'none';
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = '<i class="feather-icon icon-zap"></i> Get Tips & Suggestions';
+                
+                if (data.success) {
+                    // Display tips
+                    if (data.tips && data.tips.length > 0) {
+                        tipsList.innerHTML = '';
+                        data.tips.forEach(function(tip) {
+                            const li = document.createElement('li');
+                            li.className = 'mb-2';
+                            li.innerHTML = '<i class="feather-icon icon-check-circle text-primary me-2"></i>' + 
+                                         '<span>' + (tip.tip || tip) + '</span>';
+                            tipsList.appendChild(li);
+                        });
+                        tipsSection.style.display = 'block';
+                    }
+                    
+                    // Display suggestions (max 3)
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        suggestionsGrid.innerHTML = '';
+                        const maxSuggestions = Math.min(data.suggestions.length, 3);
+                        for (let i = 0; i < maxSuggestions; i++) {
+                            const suggestion = data.suggestions[i];
+                            const col = document.createElement('div');
+                            col.className = 'col-md-4 mb-3';
+                            
+                            const card = document.createElement('div');
+                            card.className = 'card h-100 shadow-sm';
+                            
+                            const cardBody = document.createElement('div');
+                            cardBody.className = 'card-body';
+                            
+                            const title = document.createElement('h5');
+                            title.className = 'card-title';
+                            title.textContent = suggestion.activity_name || 'Unnamed Activity';
+                            
+                            const description = document.createElement('p');
+                            description.className = 'card-text text-muted';
+                            description.textContent = (suggestion.description || 'No description available').substring(0, 150);
+                            if ((suggestion.description || '').length > 150) {
+                                description.textContent += '...';
+                            }
+                            
+                            const link = document.createElement('a');
+                            // Construct URL by extracting base path structure
+                            const currentUrl = '{% url "activity:activity_detail" activity.uri %}';
+                            const urlParts = currentUrl.split('/');
+                            // Remove the last part (current URI) and rebuild
+                            urlParts.pop(); // Remove empty string after trailing slash
+                            urlParts.pop(); // Remove the activity URI part
+                            const basePath = urlParts.join('/') + '/';
+                            link.href = basePath + encodeURIComponent(suggestion.uri) + '/';
+                            link.className = 'btn btn-sm btn-primary mt-2';
+                            link.innerHTML = '<i class="feather-icon icon-arrow-right"></i> View Details';
+                            
+                            cardBody.appendChild(title);
+                            cardBody.appendChild(description);
+                            cardBody.appendChild(link);
+                            card.appendChild(cardBody);
+                            col.appendChild(card);
+                            suggestionsGrid.appendChild(col);
+                        }
+                        suggestionsSection.style.display = 'block';
+                    }
+                } else {
+                    errorText.textContent = data.error || 'Failed to load tips and suggestions.';
+                    errorMessage.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = '<i class="feather-icon icon-zap"></i> Get Tips & Suggestions';
+                errorText.textContent = 'An error occurred while loading tips and suggestions. Please try again.';
+                errorMessage.style.display = 'block';
+                console.error('Error:', error);
+            });
+    });
+});
+</script>
+
 {% include 'trelix_app/footer.html' %}
 {% endblock %}
 
