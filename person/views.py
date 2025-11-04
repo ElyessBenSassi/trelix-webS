@@ -60,6 +60,7 @@ def sign_up(request):
             messages.success(request, f'Account created successfully! Welcome, {name}!')
             # Set session data for authentication
             request.session['person_uri'] = person_uri
+            request.session['user_uri'] = person_uri  # ✅ ajout
             request.session['person_name'] = name
             request.session['person_email'] = email
             
@@ -101,6 +102,8 @@ def sign_in(request):
         
         if person_data:
             request.session['person_uri'] = person_data['uri']
+            request.session['user_uri'] = person_data['uri']  # ✅ pour le système des événements
+
             request.session['person_name'] = person_data['name']
             request.session['person_email'] = person_data['email']
             

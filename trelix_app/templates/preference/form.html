@@ -1,115 +1,458 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>{% if preference %}Modifier{% else %}Créer{% endif %} une Préférence</title>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f6f8fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}{% if preference %}Modifier{% else %}Créer{% endif %} Préférence{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
 
-    .form-container {
-      background: #fff;
-      padding: 30px 40px;
-      border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      width: 400px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 25px;
-      font-size: 22px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      color: #444;
-    }
-
-    select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background-color: #fafafa;
-      font-size: 14px;
-      transition: border-color 0.3s ease;
-    }
-
-    select:focus {
-      border-color: #4f46e5;
-      outline: none;
-      background-color: #fff;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #4f46e5;
-      border: none;
-      color: white;
-      border-radius: 8px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #4338ca;
-    }
-  </style>
-</head>
-<body>
-  <div class="form-container">
-    <h1>{% if preference %}Modifier{% else %}Créer{% endif %} une Préférence</h1>
-
-    <form method="POST">
-      {% csrf_token %}
-      
-      <label>Langue :</label>
-      <select name="langue" required>
-        <option value="Français" {% if preference.langue == 'Français' %}selected{% endif %}>Français</option>
-        <option value="Anglais" {% if preference.langue == 'Anglais' %}selected{% endif %}>Anglais</option>
-      </select>
-
-      <label>Format du cours :</label>
-      <select name="formatCours" required>
-        <option value="PDF" {% if preference.formatCours == 'PDF' %}selected{% endif %}>PDF</option>
-        <option value="Vidéo" {% if preference.formatCours == 'Vidéo' %}selected{% endif %}>Vidéo</option>
-        <option value="Quiz" {% if preference.formatCours == 'Quiz' %}selected{% endif %}>Quiz</option>
-        <option value="Interactif" {% if preference.formatCours == 'Interactif' %}selected{% endif %}>Interactif</option>
-      </select>
-
-      <label>Période d'étude :</label>
-      <select name="periode">
-        <option value="Jour" {% if preference.periode == 'Jour' %}selected{% endif %}>Jour</option>
-        <option value="Nuit" {% if preference.periode == 'Nuit' %}selected{% endif %}>Nuit</option>
-      </select>
-
-      <label>Étudier pendant les vacances :</label>
-      <select name="vacances">
-        <option value="Oui" {% if preference.vacances == 'Oui' %}selected{% endif %}>Oui</option>
-        <option value="Non" {% if preference.vacances == 'Non' %}selected{% endif %}>Non</option>
-      </select>
-
-      <label>Mode d'étude :</label>
-      <select name="modeEtude">
-        <option value="Individuel" {% if preference.modeEtude == 'Individuel' %}selected{% endif %}>Individuel</option>
-        <option value="Groupe" {% if preference.modeEtude == 'Groupe' %}selected{% endif %}>Groupe</option>
-      </select>
-
-      <button type="submit">💾 Enregistrer</button>
-    </form>
+{% get_static_prefix as STATIC_PREFIX %}
+<section class="promo-sec position-relative overflow-hidden"
+ style="background: linear-gradient(135deg, rgba(99,102,241,.95) 0%, rgba(139,92,246,.95) 100%); padding:60px 0;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="display-4 text-white fw-bold mb-3">
+          {% if preference %}<i class="feather-icon icon-edit-3"></i> Modifier les Préférences
+          {% else %}<i class="feather-icon icon-plus-circle"></i> Créer des Préférences{% endif %}
+        </h1>
+        <p class="text-white-50 fs-5 mb-4">
+          {% if preference %}Mettez à jour vos préférences d'apprentissage{% else %}
+          Configurez vos préférences d'apprentissage{% endif %}
+        </p>
+      </div>
+    </div>
   </div>
-</body>
-</html>
+</section>
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+
+        <div class="card border-0 shadow-lg custom-card">
+          <div class="card-header bg-gradient-primary text-white py-4">
+            <div class="d-flex align-items-center justify-content-center">
+              <div class="icon-wrapper bg-white-20 me-3">
+                <i class="feather-icon {% if preference %}icon-edit-3{% else %}icon-plus-circle{% endif %} text-white"></i>
+              </div>
+              <h2 class="h4 mb-0">
+                {% if preference %}Modifier les Préférences{% else %}Créer des Préférences{% endif %}
+              </h2>
+            </div>
+          </div>
+          <div class="card-body p-5">
+            <form method="post" id="preferenceForm">
+              {% csrf_token %}
+
+              <!-- Langue -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-globe me-2"></i>
+                  Langue *
+                </label>
+                <div class="radio-group">
+                  <div class="radio-option">
+                    <input type="radio" id="langue_fr" name="langue" value="Français" 
+                           {% if preference.langue == 'Français' %}checked{% endif %} required>
+                    <label for="langue_fr" class="radio-label">
+                      <span class="radio-check"></span>
+                      Français
+                    </label>
+                  </div>
+                  <div class="radio-option">
+                    <input type="radio" id="langue_en" name="langue" value="Anglais"
+                           {% if preference.langue == 'Anglais' %}checked{% endif %}>
+                    <label for="langue_en" class="radio-label">
+                      <span class="radio-check"></span>
+                      Anglais
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Format du cours -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-book me-2"></i>
+                  Format du cours *
+                </label>
+                <div class="radio-group">
+                  <div class="radio-option">
+                    <input type="radio" id="format_pdf" name="formatCours" value="PDF"
+                           {% if preference.formatCours == 'PDF' %}checked{% endif %} required>
+                    <label for="format_pdf" class="radio-label">
+                      <span class="radio-check"></span>
+                      PDF
+                    </label>
+                  </div>
+                  <div class="radio-option">
+                    <input type="radio" id="format_video" name="formatCours" value="Vidéo"
+                           {% if preference.formatCours == 'Vidéo' %}checked{% endif %}>
+                    <label for="format_video" class="radio-label">
+                      <span class="radio-check"></span>
+                      Vidéo
+                    </label>
+                  </div>
+                  <div class="radio-option">
+                    <input type="radio" id="format_quiz" name="formatCours" value="Quiz"
+                           {% if preference.formatCours == 'Quiz' %}checked{% endif %}>
+                    <label for="format_quiz" class="radio-label">
+                      <span class="radio-check"></span>
+                      Quiz
+                    </label>
+                  </div>
+                  <div class="radio-option">
+                    <input type="radio" id="format_interactif" name="formatCours" value="Interactif"
+                           {% if preference.formatCours == 'Interactif' %}checked{% endif %}>
+                    <label for="format_interactif" class="radio-label">
+                      <span class="radio-check"></span>
+                      Interactif
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Période d'étude -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-clock me-2"></i>
+                  Période d'étude
+                </label>
+                <div class="radio-group">
+                  <div class="radio-option">
+                    <input type="radio" id="periode_jour" name="periode" value="Jour"
+                           {% if preference.periode == 'Jour' %}checked{% endif %}>
+                    <label for="periode_jour" class="radio-label">
+                      <span class="radio-check"></span>
+                      Jour
+                    </label>
+                  </div>
+                  <div class="radio-option">
+                    <input type="radio" id="periode_nuit" name="periode" value="Nuit"
+                           {% if preference.periode == 'Nuit' %}checked{% endif %}>
+                    <label for="periode_nuit" class="radio-label">
+                      <span class="radio-check"></span>
+                      Nuit
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Étudier pendant les vacances -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-sun me-2"></i>
+                  Étudier pendant les vacances
+                </label>
+                <div class="radio-group">
+                  <div class="radio-option">
+                    <input type="radio" id="vacances_oui" name="vacances" value="Oui"
+                           {% if preference.vacances == 'Oui' %}checked{% endif %}>
+                    <label for="vacances_oui" class="radio-label">
+                      <span class="radio-check"></span>
+                      Oui
+                    </label>
+                  </div>
+                  <div class="radio-option">
+                    <input type="radio" id="vacances_non" name="vacances" value="Non"
+                           {% if preference.vacances == 'Non' %}checked{% endif %}>
+                    <label for="vacances_non" class="radio-label">
+                      <span class="radio-check"></span>
+                      Non
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mode d'étude -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-users me-2"></i>
+                  Mode d'étude
+                </label>
+                <div class="radio-group">
+                  <div class="radio-option">
+                    <input type="radio" id="mode_individuel" name="modeEtude" value="Individuel"
+                           {% if preference.modeEtude == 'Individuel' %}checked{% endif %}>
+                    <label for="mode_individuel" class="radio-label">
+                      <span class="radio-check"></span>
+                      Individuel
+                    </label>
+                  </div>
+                  <div class="radio-option">
+                    <input type="radio" id="mode_groupe" name="modeEtude" value="Groupe"
+                           {% if preference.modeEtude == 'Groupe' %}checked{% endif %}>
+                    <label for="mode_groupe" class="radio-label">
+                      <span class="radio-check"></span>
+                      Groupe
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions mt-5 pt-4 border-top">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button type="submit" class="btn btn-custom-primary">
+                    <i class="feather-icon icon-save me-2"></i>
+                    {% if preference %} Mettre à jour {% else %} Créer les préférences {% endif %}
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary-color: #6c757d;
+  --success-color: #10b981;
+  --border-color: #e2e8f0;
+  --shadow-light: 0 2px 15px rgba(0,0,0,0.08);
+  --shadow-medium: 0 5px 25px rgba(0,0,0,0.1);
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.custom-card {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+.card-header.bg-gradient-primary {
+  background: var(--gradient-primary) !important;
+  border: none;
+}
+
+.icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+/* Labels */
+.form-label-custom {
+  color: #1e293b !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+/* Radio Groups */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radio-option {
+  position: relative;
+}
+
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #334155;
+}
+
+.radio-label:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+.radio-option input[type="radio"]:checked + .radio-label {
+  border-color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.05);
+  color: var(--primary-color);
+}
+
+.radio-check {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  margin-right: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-label .radio-check {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+}
+
+.radio-option input[type="radio"]:checked + .radio-label .radio-check::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Buttons */
+.btn-custom-primary {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-custom-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  color: white;
+}
+
+/* Form Actions */
+.form-actions {
+  border-top: 1px solid var(--border-color);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-group-custom {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.form-group-custom:nth-child(1) { animation-delay: 0.1s; }
+.form-group-custom:nth-child(2) { animation-delay: 0.2s; }
+.form-group-custom:nth-child(3) { animation-delay: 0.3s; }
+.form-group-custom:nth-child(4) { animation-delay: 0.4s; }
+.form-group-custom:nth-child(5) { animation-delay: 0.5s; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 2rem !important;
+  }
+  
+  .btn-custom-primary {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .radio-label {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Validation styles */
+.radio-group:has(input:required:invalid) .radio-label {
+  border-color: #ef4444;
+}
+
+.radio-group:has(input:required:valid) .radio-label {
+  border-color: var(--border-color);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Animation pour les boutons radio
+  const radioLabels = document.querySelectorAll('.radio-label');
+  
+  radioLabels.forEach(label => {
+    label.addEventListener('click', function() {
+      // Ajouter une animation de sélection
+      this.style.transform = 'scale(0.98)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 150);
+    });
+  });
+
+  // Validation du formulaire
+  const form = document.getElementById('preferenceForm');
+  form.addEventListener('submit', function(e) {
+    const requiredGroups = form.querySelectorAll('.form-group-custom:has(input[required])');
+    let isValid = true;
+
+    requiredGroups.forEach(group => {
+      const radios = group.querySelectorAll('input[type="radio"]');
+      const isChecked = Array.from(radios).some(radio => radio.checked);
+      
+      if (!isChecked) {
+        isValid = false;
+        // Mettre en évidence le groupe non rempli
+        group.querySelector('.radio-group').style.border = '2px solid #ef4444';
+        group.querySelector('.radio-group').style.borderRadius = '8px';
+        group.querySelector('.radio-group').style.padding = '4px';
+      } else {
+        group.querySelector('.radio-group').style.border = '';
+        group.querySelector('.radio-group').style.padding = '';
+      }
+    });
+
+    if (!isValid) {
+      e.preventDefault();
+      alert('Veuillez remplir tous les champs obligatoires (*)');
+    }
+  });
+
+  // Réinitialiser la validation quand l'utilisateur sélectionne une option
+  const allRadios = document.querySelectorAll('input[type="radio"]');
+  allRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      const group = this.closest('.form-group-custom');
+      if (group) {
+        group.querySelector('.radio-group').style.border = '';
+        group.querySelector('.radio-group').style.padding = '';
+      }
+    });
+  });
+});
+</script>
+
+{% include 'trelix_app/footer.html' %}
+{% endblock %}

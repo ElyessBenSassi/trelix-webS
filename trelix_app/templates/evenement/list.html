@@ -1,93 +1,797 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Liste des Événements</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f7f9fc;
-            color: #333;
-            padding: 40px;
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-        }
-        a {
-            text-decoration: none;
-        }
-        .add-btn {
-            display: inline-block;
-            margin-bottom: 15px;
-            padding: 10px 18px;
-            background: #3498db;
-            color: white;
-            border-radius: 6px;
-        }
-        .add-btn:hover {
-            background: #2980b9;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background: #ecf0f1;
-        }
-        tr:hover {
-            background: #f2f6f8;
-        }
-        .action-btn {
-            padding: 5px 10px;
-            border-radius: 4px;
-            color: white;
-            font-weight: bold;
-        }
-        .edit-btn {
-            background: #f39c12;
-        }
-        .delete-btn {
-            background: #e74c3c;
-        }
-    </style>
-</head>
-<body>
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Événements - Trelix{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
 
-<h1>📅 Liste des Événements</h1>
+<!-- Promo Section Start -->
+<section class="promo-sec position-relative overflow-hidden"
+ style="background: linear-gradient(135deg, rgba(99,102,241,.95) 0%, rgba(139,92,246,.95) 100%); padding:80px 0 60px;">
+   <div class="container">
+      <div class="row">
+         <div class="col-lg-12 text-center">
+            <h1 class="display-4 text-white fw-bold mb-3">📅 Nos Événements</h1>
+            <nav aria-label="breadcrumb mt-0">
+               <ol class="breadcrumb justify-content-center">
+                  <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50">Accueil</a></li>
+                  <li class="breadcrumb-item active text-white" aria-current="page">Événements</li>
+               </ol>
+            </nav>
+         </div>
+      </div>
+   </div>
+</section>
+<!-- Promo Section End -->
 
-<a href="{% url 'evenement:evenement_create' %}" class="add-btn">➕ Ajouter un événement</a>
+<!-- Event Section Start -->
+<div class="event-main sec-padding bg-light">
+   <div class="container">
+      <!-- Header avec bouton d'ajout -->
+      <div class="row mb-5">
+         <div class="col-lg-8">
+            <h2 class="display-6 fw-bold text-dark mb-3">Découvrez nos prochains événements</h2>
+            <p class="text-muted fs-5">Participez à des expériences uniques et enrichissantes</p>
+         </div>
+         <div class="col-lg-4 text-lg-end">
+            <a href="{% url 'evenement:evenement_create' %}" class="btn btn-primary btn-lg rounded-pill px-4">
+               <i class="feather-icon icon-plus me-2"></i>Créer un événement
+            </a>
+         </div>
+      </div>
 
-<table>
-    <tr>
-        <th>Nom</th>
-        <th>Date</th>
-        <th>Description</th>
-        <th>Lieu</th>
-        <th>Actions</th>
-    </tr>
-    {% for e in evenements %}
-    <tr>
-        <td>{{ e.nomEvenement }}</td>
-        <td>{{ e.dateEvenement }}</td>
-        <td>{{ e.description }}</td>
-        <td>{{ e.lieu }}</td>
-        <td>
-            <a href="{% url 'evenement:evenement_update' %}?uri={{ e.uri }}" class="action-btn edit-btn">✏️</a>
-            <a href="{% url 'evenement:evenement_delete' %}?uri={{ e.uri }}" class="action-btn delete-btn">🗑️</a>
-        </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="5" style="text-align:center;">Aucun événement trouvé.</td></tr>
-    {% endfor %}
-</table>
+      <!-- Système de Filtrage et Recherche -->
+      <div class="row mb-5">
+         <div class="col-12">
+            <div class="card border-0 shadow-sm">
+               <div class="card-body p-4">
+                  <div class="row g-3 align-items-end">
+                     <!-- Barre de recherche -->
+                     <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-semibold text-muted mb-2">
+                           <i class="feather-icon icon-search me-1"></i>Rechercher
+                        </label>
+                        <div class="input-group">
+                           <input type="text" class="form-control" id="searchInput" placeholder="Rechercher un événement...">
+                           <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                              <i class="feather-icon icon-x"></i>
+                           </button>
+                        </div>
+                     </div>
 
-</body>
-</html>
+                     <!-- Filtre par type -->
+                     <div class="col-lg-2 col-md-6">
+                        <label class="form-label fw-semibold text-muted mb-2">
+                           <i class="feather-icon icon-tag me-1"></i>Type
+                        </label>
+                        <select class="form-select" id="typeFilter">
+                           <option value="">Tous les types</option>
+                           <option value="HackathonEvent">Hackathon</option>
+                           <option value="WorkshopEvent">Workshop</option>
+                        </select>
+                     </div>
+
+                     <!-- Filtre par statut -->
+                     <div class="col-lg-2 col-md-6">
+                        <label class="form-label fw-semibold text-muted mb-2">
+                           <i class="feather-icon icon-clock me-1"></i>Statut
+                        </label>
+                        <select class="form-select" id="statusFilter">
+                           <option value="">Tous statuts</option>
+                           <option value="upcoming">À venir</option>
+                           <option value="past">Terminés</option>
+                        </select>
+                     </div>
+
+                     <!-- Filtre par lieu -->
+                     <div class="col-lg-2 col-md-6">
+                        <label class="form-label fw-semibold text-muted mb-2">
+                           <i class="feather-icon icon-map-pin me-1"></i>Lieu
+                        </label>
+                        <select class="form-select" id="locationFilter">
+                           <option value="">Tous lieux</option>
+                           {% for e in evenements %}
+                              <option value="{{ e.lieu }}">{{ e.lieu }}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+
+                     <!-- Filtres avancés -->
+                     <div class="col-12 mt-3" id="advancedFilters" style="display: none;">
+                        <div class="row g-3">
+                           <div class="col-md-3">
+                              <label class="form-label fw-semibold text-muted mb-2">
+                                 <i class="feather-icon icon-calendar me-1"></i>Date de début
+                              </label>
+                              <input type="date" class="form-control" id="startDateFilter">
+                           </div>
+                           <div class="col-md-3">
+                              <label class="form-label fw-semibold text-muted mb-2">
+                                 <i class="feather-icon icon-calendar me-1"></i>Date de fin
+                              </label>
+                              <input type="date" class="form-control" id="endDateFilter">
+                           </div>
+                           <div class="col-md-3">
+                              <label class="form-label fw-semibold text-muted mb-2">
+                                 <i class="feather-icon icon-filter me-1"></i>Trier par
+                              </label>
+                              <select class="form-select" id="sortFilter">
+                                 <option value="default">Ordre par défaut</option>
+                                 <option value="date-asc">Date croissante</option>
+                                 <option value="date-desc">Date décroissante</option>
+                                 <option value="name-asc">Nom A-Z</option>
+                                 <option value="name-desc">Nom Z-A</option>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+
+                     <!-- Actions des filtres -->
+                     <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                           <div class="d-flex gap-2">
+                              <button class="btn btn-outline-primary btn-sm" id="toggleFilters">
+                                 <i class="feather-icon icon-filter me-1"></i>
+                                 Filtres avancés
+                              </button>
+                              <button class="btn btn-outline-secondary btn-sm" id="resetFilters">
+                                 <i class="feather-icon icon-refresh-cw me-1"></i>
+                                 Réinitialiser
+                              </button>
+                           </div>
+                           <div class="d-flex align-items-center gap-3">
+                              <span class="badge bg-primary" id="activeFiltersCount">0</span>
+                              <span class="text-muted small" id="filterSummary">{{ evenements|length }} événement(s)</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Grid des événements -->
+      <div class="row g-4" id="eventsContainer">
+         {% for e in evenements %}
+         <div class="col-xl-4 col-md-6 event-item" 
+              data-event-name="{{ e.nomEvenement|lower }}"
+              data-event-type="{{ e.typeEvenement }}"  
+              data-event-location="{{ e.lieu|lower }}"
+              data-event-start="{{ e.dateDebut }}"
+              data-event-end="{{ e.dateFin }}"
+              data-event-status="{% now 'Y-m-d' as current_date %}{% if e.dateFin >= current_date %}upcoming{% else %}past{% endif %}">
+            <div class="event-entry shadow-sm overflow-hidden rounded-4 h-100">
+               <div class="event-thumb position-relative">
+                  {% if e.image %}
+                     <img class="img-fluid w-100" src="/media/{{ e.image }}" alt="{{ e.nomEvenement }}">
+                  {% else %}
+                     <img class="img-fluid w-100" src="{% static 'images/event-default.jpg' %}" alt="{{ e.nomEvenement }}">
+                  {% endif %}
+                  <div class="event-type-badge position-absolute top-0 end-0 m-3">
+                     <!-- Afficher le nom simplifié mais garder la valeur complète pour le filtrage -->
+                     <span class="badge bg-primary rounded-pill px-3 py-2">
+                        {% if e.typeEvenement == "HackathonEvent" %}Hackathon
+                        {% elif e.typeEvenement == "WorkshopEvent" %}Workshop
+                        {% else %}{{ e.typeEvenement }}{% endif %}
+                     </span>
+                  </div>
+                  <!-- Badge de statut sur l'image -->
+                  <div class="event-status-badge position-absolute top-0 start-0 m-3">
+                     {% now "Y-m-d" as current_date %}
+                     {% if e.dateFin >= current_date %}
+                     <span class="badge bg-success rounded-pill px-3 py-2">
+                        <i class="feather-icon icon-clock me-1"></i>À venir
+                     </span>
+                     {% else %}
+                     <span class="badge bg-secondary rounded-pill px-3 py-2">
+                        <i class="feather-icon icon-check me-1"></i>Terminé
+                     </span>
+                     {% endif %}
+                  </div>
+               </div>
+               
+               <div class="entry-content p-4 d-flex flex-column h-100">
+                  <!-- Nom de l'événement en grand -->
+                  <h2 class="event-title fw-bold mb-3 text-center">
+                     {{ e.nomEvenement }}
+                  </h2>
+
+                  <!-- Dates Début et Fin -->
+                  <div class="date-section mb-4">
+                     <div class="row g-2 text-center">
+                        <div class="col-6">
+                           <div class="date-info">
+                              <div class="date-label text-muted small mb-1">Début</div>
+                              <div class="date-value fw-bold text-primary">
+                                 {{ e.dateDebut }}
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-6">
+                           <div class="date-info">
+                              <div class="date-label text-muted small mb-1">Fin</div>
+                              <div class="date-value fw-bold text-warning">
+                                 {{ e.dateFin }}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <!-- Lieu et Type -->
+                  <div class="event-meta mb-4">
+                     <div class="row g-3 text-center">
+                        <div class="col-12">
+                           <span class="d-flex align-items-center justify-content-center text-muted fw-semibold">
+                              <i class="feather-icon icon-map-pin me-2 text-primary"></i>
+                              {{ e.lieu }}
+                           </span>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="event-footer d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                     <!-- Participants ou autre info -->
+                     <div class="event-info">
+                        <a href="{% url 'evenement:detail_evenement' e.uri %}" class="btn btn-primary btn-sm rounded-pill">
+                           <i class="feather-icon icon-eye me-1"></i>
+                           Voir détails
+                        </a>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         {% empty %}
+         <div class="col-12">
+            <div class="text-center py-5" id="emptyState">
+               <div class="empty-state-icon mb-4">
+                  <i class="feather-icon icon-calendar display-1 text-muted"></i>
+               </div>
+               <h3 class="text-muted mb-3">Aucun événement disponible</h3>
+               <p class="text-muted mb-4">Revenez plus tard pour découvrir nos prochains événements.</p>
+            </div>
+         </div>
+         {% endfor %}
+      </div>
+
+      <!-- État vide après filtrage -->
+      <div class="row d-none" id="noResultsState">
+         <div class="col-12">
+            <div class="text-center py-5">
+               <div class="empty-state-icon mb-4">
+                  <i class="feather-icon icon-search display-1 text-muted"></i>
+               </div>
+               <h3 class="text-muted mb-3">Aucun événement trouvé</h3>
+               <p class="text-muted mb-4">Aucun événement ne correspond à vos critères de recherche.</p>
+               <button class="btn btn-outline-primary" id="resetSearch">
+                  <i class="feather-icon icon-refresh-cw me-2"></i>
+                  Réinitialiser la recherche
+               </button>
+            </div>
+         </div>
+      </div>
+
+      <!-- Pagination -->
+      {% if evenements.has_other_pages %}
+      <div class="row mt-5">
+         <div class="col-lg-12">
+            <div class="pager text-center">
+               {% if evenements.has_previous %}
+               <a href="?page={{ evenements.previous_page_number }}" class="next-btn rounded-circle"> 
+                  <i class="feather-icon icon-arrow-left"></i>
+               </a>
+               {% endif %}
+               
+               {% for i in evenements.paginator.page_range %}
+                  {% if evenements.number == i %}
+                  <span class="current rounded-circle">{{ i }}</span>
+                  {% else %}
+                  <a href="?page={{ i }}" class="rounded-circle">{{ i }}</a>
+                  {% endif %}
+               {% endfor %}
+               
+               {% if evenements.has_next %}
+               <a href="?page={{ evenements.next_page_number }}" class="prev-btn rounded-circle"> 
+                  <i class="feather-icon icon-arrow-right"></i>
+               </a>
+               {% endif %}
+            </div>
+         </div>
+      </div>
+      {% endif %}
+   </div>
+</div>
+<!-- Event Section End -->
+
+<!-- Newsletter Section Start -->
+<section class="newsletter bg-primary py-5">
+   <div class="container">
+      <div class="row align-items-center">
+         <div class="col-lg-8 mb-4 mb-lg-0">
+            <span class="badge bg-white text-primary rounded-pill px-3 py-2 mb-3 d-inline-block">Restez Informé</span>
+            <h2 class="display-5 fw-bold text-white mb-3">Abonnez-vous à notre <span class="text-warning">Newsletter</span></h2>
+            <p class="text-white-50 mb-0">Ne manquez aucun de nos événements exclusifs</p>
+         </div>
+         <div class="col-lg-4">
+            <div class="newsletter-form">
+               <form action="#">
+                  <div class="input-group">
+                     <input class="form-control rounded-pill border-0 py-3" type="email" placeholder="Adresse Email">
+                     <button class="btn btn-warning rounded-pill px-4 ms-2">
+                        <i class="feather-icon icon-send"></i>
+                     </button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+</section>
+<!-- Newsletter Section End -->
+
+<style>
+/* Votre CSS existant reste inchangé */
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary-color: #6c757d;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --border-color: #e9ecef;
+  --shadow-light: 0 2px 15px rgba(0,0,0,0.08);
+  --shadow-medium: 0 5px 25px rgba(0,0,0,0.1);
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.event-entry {
+   background: white;
+   transition: all 0.3s ease;
+   border: 1px solid var(--border-color);
+   display: flex;
+   flex-direction: column;
+}
+
+.event-entry:hover {
+   transform: translateY(-8px);
+   box-shadow: var(--shadow-medium);
+   border-color: var(--primary-color);
+}
+
+.event-thumb {
+   overflow: hidden;
+   height: 200px;
+   position: relative;
+}
+
+.event-thumb img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   transition: transform 0.5s ease;
+}
+
+.event-entry:hover .event-thumb img {
+   transform: scale(1.1);
+}
+
+.event-type-badge .badge {
+   font-size: 0.75rem;
+   font-weight: 600;
+   text-transform: uppercase;
+   letter-spacing: 0.5px;
+}
+
+.event-status-badge .badge {
+   font-size: 0.7rem;
+   font-weight: 600;
+   letter-spacing: 0.5px;
+}
+
+/* Section Dates */
+.date-section {
+   margin: 0 0 1rem 0;
+}
+
+.date-info {
+   padding: 0.5rem;
+}
+
+.date-label {
+   font-weight: 500;
+   letter-spacing: 0.5px;
+}
+
+.date-value {
+   font-size: 0.9rem;
+   line-height: 1.2;
+}
+
+/* Nom d'événement en grand format */
+.event-title {
+   font-size: 1.5rem;
+   line-height: 1.3;
+   min-height: 3.5rem;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: #1e293b;
+   margin-bottom: 1rem;
+   text-align: center;
+   word-wrap: break-word;
+}
+
+/* Métadonnées */
+.event-meta {
+   font-size: 0.95rem;
+}
+
+.event-meta span {
+   display: flex;
+   align-items: center;
+}
+
+.entry-content {
+   background: white;
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+}
+
+.event-footer {
+   border-top: 1px solid var(--border-color);
+   padding-top: 1rem;
+   margin-top: auto;
+}
+
+/* Styles pour les filtres */
+.form-select:focus, .form-control:focus {
+   border-color: #6366f1;
+   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+#advancedFilters {
+   animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+   from {
+      opacity: 0;
+      transform: translateY(-10px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+/* Badge pour le compteur de filtres */
+#activeFiltersCount {
+   animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+   0% { transform: scale(1); }
+   50% { transform: scale(1.1); }
+   100% { transform: scale(1); }
+}
+
+/* Animation pour les cartes */
+@keyframes fadeInUp {
+   from {
+      opacity: 0;
+      transform: translateY(30px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+.event-item {
+   animation: fadeInUp 0.6s ease forwards;
+}
+
+.event-item:nth-child(1) { animation-delay: 0.1s; }
+.event-item:nth-child(2) { animation-delay: 0.2s; }
+.event-item:nth-child(3) { animation-delay: 0.3s; }
+.event-item:nth-child(4) { animation-delay: 0.4s; }
+.event-item:nth-child(5) { animation-delay: 0.5s; }
+.event-item:nth-child(6) { animation-delay: 0.6s; }
+
+/* Effets de brillance sur les cartes */
+.event-entry::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: -100%;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+   );
+   transition: left 0.5s;
+   z-index: 1;
+}
+
+.event-entry:hover::before {
+   left: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+   .event-thumb {
+      height: 180px;
+   }
+   
+   .event-title {
+      font-size: 1.3rem;
+      min-height: 3.2rem;
+   }
+   
+   .date-value {
+      font-size: 0.85rem;
+   }
+   
+   .event-footer {
+      flex-direction: column;
+      gap: 15px;
+      text-align: center;
+   }
+   
+   .pager a, .pager span {
+      width: 40px;
+      height: 40px;
+      font-size: 0.9rem;
+   }
+}
+
+@media (max-width: 576px) {
+   .sec-padding {
+      padding: 60px 0;
+   }
+   
+   .event-thumb {
+      height: 160px;
+   }
+   
+   .entry-content {
+      padding: 1.5rem !important;
+   }
+   
+   .event-title {
+      font-size: 1.25rem;
+   }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments DOM
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    const typeFilter = document.getElementById('typeFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const locationFilter = document.getElementById('locationFilter');
+    const startDateFilter = document.getElementById('startDateFilter');
+    const endDateFilter = document.getElementById('endDateFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const toggleFilters = document.getElementById('toggleFilters');
+    const resetFilters = document.getElementById('resetFilters');
+    const advancedFilters = document.getElementById('advancedFilters');
+    const activeFiltersCount = document.getElementById('activeFiltersCount');
+    const filterSummary = document.getElementById('filterSummary');
+    const eventsContainer = document.getElementById('eventsContainer');
+    const noResultsState = document.getElementById('noResultsState');
+    const emptyState = document.getElementById('emptyState');
+    const resetSearch = document.getElementById('resetSearch');
+
+    const eventItems = document.querySelectorAll('.event-item');
+
+    // État des filtres
+    let filters = {
+        search: '',
+        type: '',
+        status: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        sort: 'default'
+    };
+
+    // Appliquer les filtres
+    function applyFilters() {
+        let visibleItems = Array.from(eventItems);
+        let activeFilterCount = 0;
+
+        // Filtre de recherche
+        if (filters.search) {
+            visibleItems = visibleItems.filter(item => {
+                const eventName = item.dataset.eventName.toLowerCase();
+                return eventName.includes(filters.search.toLowerCase());
+            });
+            activeFilterCount++;
+        }
+
+        // Filtre par type - CORRECTION ICI : utiliser la valeur exacte "HackathonEvent" ou "WorkshopEvent"
+        if (filters.type) {
+            visibleItems = visibleItems.filter(item => 
+                item.dataset.eventType === filters.type
+            );
+            activeFilterCount++;
+        }
+
+        // Filtre par statut
+        if (filters.status) {
+            visibleItems = visibleItems.filter(item => 
+                item.dataset.eventStatus === filters.status
+            );
+            activeFilterCount++;
+        }
+
+        // Filtre par lieu
+        if (filters.location) {
+            visibleItems = visibleItems.filter(item => 
+                item.dataset.eventLocation === filters.location.toLowerCase()
+            );
+            activeFilterCount++;
+        }
+
+        // Filtre par date de début
+        if (filters.startDate) {
+            visibleItems = visibleItems.filter(item => 
+                item.dataset.eventStart >= filters.startDate
+            );
+            activeFilterCount++;
+        }
+
+        // Filtre par date de fin
+        if (filters.endDate) {
+            visibleItems = visibleItems.filter(item => 
+                item.dataset.eventEnd <= filters.endDate
+            );
+            activeFilterCount++;
+        }
+
+        // Tri
+        if (filters.sort !== 'default') {
+            visibleItems.sort((a, b) => {
+                const aValue = filters.sort.includes('date') ? a.dataset[filters.sort.split('-')[0]] : a.dataset.eventName;
+                const bValue = filters.sort.includes('date') ? b.dataset[filters.sort.split('-')[0]] : b.dataset.eventName;
+                
+                if (filters.sort.includes('asc')) {
+                    return aValue.localeCompare(bValue);
+                } else {
+                    return bValue.localeCompare(aValue);
+                }
+            });
+        }
+
+        // Mise à jour de l'UI
+        updateUI(visibleItems, activeFilterCount);
+    }
+
+    // Mettre à jour l'interface
+    function updateUI(visibleItems, activeFilterCount) {
+        // Masquer/afficher les éléments
+        eventItems.forEach(item => {
+            if (visibleItems.includes(item)) {
+                item.style.display = '';
+                item.style.animation = 'fadeInUp 0.5s ease';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Mettre à jour les compteurs
+        activeFiltersCount.textContent = activeFilterCount;
+        filterSummary.textContent = `${visibleItems.length} événement(s)`;
+
+        // Gérer les états vides
+        if (visibleItems.length === 0) {
+            eventsContainer.classList.add('d-none');
+            noResultsState.classList.remove('d-none');
+            if (emptyState) emptyState.classList.add('d-none');
+        } else {
+            eventsContainer.classList.remove('d-none');
+            noResultsState.classList.add('d-none');
+            if (emptyState) emptyState.classList.add('d-none');
+        }
+
+        // Afficher/masquer le compteur de filtres
+        if (activeFilterCount > 0) {
+            activeFiltersCount.style.display = 'inline-block';
+        } else {
+            activeFiltersCount.style.display = 'none';
+        }
+    }
+
+    // Événements
+    searchInput.addEventListener('input', function() {
+        filters.search = this.value;
+        applyFilters();
+    });
+
+    clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        filters.search = '';
+        applyFilters();
+    });
+
+    typeFilter.addEventListener('change', function() {
+        filters.type = this.value;
+        applyFilters();
+    });
+
+    statusFilter.addEventListener('change', function() {
+        filters.status = this.value;
+        applyFilters();
+    });
+
+    locationFilter.addEventListener('change', function() {
+        filters.location = this.value;
+        applyFilters();
+    });
+
+    startDateFilter.addEventListener('change', function() {
+        filters.startDate = this.value;
+        applyFilters();
+    });
+
+    endDateFilter.addEventListener('change', function() {
+        filters.endDate = this.value;
+        applyFilters();
+    });
+
+    sortFilter.addEventListener('change', function() {
+        filters.sort = this.value;
+        applyFilters();
+    });
+
+    toggleFilters.addEventListener('click', function() {
+        if (advancedFilters.style.display === 'none') {
+            advancedFilters.style.display = 'block';
+            this.innerHTML = '<i class="feather-icon icon-filter me-1"></i>Masquer les filtres';
+        } else {
+            advancedFilters.style.display = 'none';
+            this.innerHTML = '<i class="feather-icon icon-filter me-1"></i>Filtres avancés';
+        }
+    });
+
+    resetFilters.addEventListener('click', function() {
+        // Réinitialiser tous les filtres
+        searchInput.value = '';
+        typeFilter.value = '';
+        statusFilter.value = '';
+        locationFilter.value = '';
+        startDateFilter.value = '';
+        endDateFilter.value = '';
+        sortFilter.value = 'default';
+        
+        filters = {
+            search: '',
+            type: '',
+            status: '',
+            location: '',
+            startDate: '',
+            endDate: '',
+            sort: 'default'
+        };
+        
+        applyFilters();
+    });
+
+    resetSearch.addEventListener('click', function() {
+        resetFilters.click();
+    });
+
+    // Initialiser l'interface
+    applyFilters();
+});
+</script>
+
+{% include 'trelix_app/footer.html' %}
+{% endblock %}
