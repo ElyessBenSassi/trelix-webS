@@ -1,0 +1,13 @@
+<h2>Edit Goal: {{ goal_title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <label>New Title:</label><br>
+  <input type="text" name="title" required><br><br>
+
+  <label>New Message:</label><br>
+  <textarea name="message" rows="4" cols="40" required></textarea><br><br>
+
+  <button type="submit">Save Changes</button>
+</form>
+<a href="{% url 'goal_list' %}">Back</a>
+

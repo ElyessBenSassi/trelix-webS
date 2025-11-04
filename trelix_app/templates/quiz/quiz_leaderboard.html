@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Leaderboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .navigation {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .nav-btn {
+      padding: 0.75rem 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      color: #667eea;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .nav-btn:hover {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .header {
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .leaderboard-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .leaderboard-header {
+      display: grid;
+      grid-template-columns: 0.5fr 2fr 1.5fr;
+      gap: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.25rem 1.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .leaderboard-body {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .leaderboard-entry {
+      display: grid;
+      grid-template-columns: 0.5fr 2fr 1.5fr;
+      gap: 1rem;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s;
+    }
+
+    .leaderboard-entry:hover {
+      background-color: #f9f9f9;
+    }
+
+    .leaderboard-entry:last-child {
+      border-bottom: none;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .rank-badge.rank-1 {
+      background: linear-gradient(135deg, #ffd700, #ffed4e);
+      color: #8b6f00;
+    }
+
+    .rank-badge.rank-2 {
+      background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+      color: #444;
+    }
+
+    .rank-badge.rank-3 {
+      background: linear-gradient(135deg, #cd7f32, #daa520);
+      color: white;
+    }
+
+    .rank-badge.other {
+      background: #f0f0f0;
+      color: #667eea;
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .player-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .player-name {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .score-display {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .score-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .empty-state {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: #999;
+    }
+
+    @media (max-width: 768px) {
+      .navigation {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        width: 100%;
+        text-align: center;
+      }
+
+      .leaderboard-header,
+      .leaderboard-entry {
+        grid-template-columns: 0.4fr 1.2fr 1fr;
+        gap: 0.75rem;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏅 Quiz Leaderboard</h1>
+      <p>Top performers on this quiz</p>
+    </div>
+
+    <div class="leaderboard-card">
+      <div class="leaderboard-header">
+        <div>Rank</div>
+        <div>Player</div>
+        <div>Score</div>
+      </div>
+
+      <div class="leaderboard-body">
+        {% if entries %}
+        {% for e in entries %}
+        <div class="leaderboard-entry">
+          <div
+            class="rank-badge {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% else %}other{% endif %}">
+            {{ forloop.counter }}
+          </div>
+          <div class="player-info">
+            <div class="player-avatar">{{ e.player|first|upper }}</div>
+            <div class="player-name">{{ e.player }}</div>
+          </div>
+          <div class="score-display">
+            <span class="score-badge">{{ e.score }}/{{ e.total }}</span>
+            <span style="color: #999; font-size: 0.9rem;">{{ e.percent }}%</span>
+          </div>
+
+        </div>
+        {% empty %}
+        <div class="empty-state">
+          <p>No entries yet.</p>
+          <p style="font-size: 0.9rem;">Be the first to play this quiz!</p>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="navigation" style="margin-top: 2rem;">
+      <a href="{% url 'join_quiz' quiz_id %}" class="nav-btn">▶ Play Again</a>
+      <a href="{% url 'quiz_detail' quiz_id %}" class="nav-btn">← Back to Quiz</a>
+      <a href="{% url 'quiz_list' %}" class="nav-btn">🏠 All Quizzes</a>
+    </div>
+  </div>
+</body>
+
+</html>

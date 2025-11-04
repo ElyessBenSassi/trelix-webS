@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: #667eea;
+            outline: none;
+            background: #f5f7ff;
+        }
+
+        .form-group input[type="text"]::placeholder {
+            color: #999;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-back {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .btn-back:hover {
+            background: #e0e0e0;
+        }
+
+        .info-box {
+            background: #f5f7ff;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: #1a1a1a;
+        }
+
+        @media (max-width: 768px) {
+            .form-card {
+                padding: 1.5rem;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .form-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <div class="form-header">
+                <div class="form-icon">🎮</div>
+                <h1 class="form-title">Join Quiz</h1>
+                <p class="form-subtitle">Enter your name to begin</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="player_name">Your Name *</label>
+                    <input 
+                        type="text" 
+                        id="player_name"
+                        name="player_name" 
+                        placeholder="Enter your name" 
+                        required
+                        minlength="2"
+                        maxlength="50"
+                    >
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Your name will appear on the leaderboard. Choose something memorable!
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-start">Start Quiz ▶</button>
+                    <a href="{% url 'quiz_list' %}" class="btn btn-back">← Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
