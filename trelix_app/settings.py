@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'rest_framework',
+    'rest_framework',
     'evaluation',
     'trelix_app',
     'activity',
@@ -166,5 +166,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # GOOGLE API KEY
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 GEMINI_MODEL_NAME = os.getenv('GEMINI_MODEL_NAME')
