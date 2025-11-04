@@ -1,0 +1,78 @@
+<!-- Reusable Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border border-danger">
+         <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="deleteConfirmModalLabel">
+               <i class="feather-icon icon-alert-triangle"></i> Delete Confirmation
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <div class="alert alert-danger mb-3">
+               <h6 class="alert-heading mb-2">
+                  <i class="feather-icon icon-alert-triangle"></i> Warning!
+               </h6>
+               <p class="mb-0" id="deleteModalWarning">You are about to delete this item. This action cannot be undone.</p>
+            </div>
+            
+            <div id="deleteModalDetails">
+               <!-- Details will be populated dynamically -->
+            </div>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+               <i class="feather-icon icon-x"></i> Cancel
+            </button>
+            <form id="deleteConfirmForm" method="post" style="display: inline;">
+               {% csrf_token %}
+               <button type="submit" class="btn btn-danger">
+                  <i class="feather-icon icon-trash-2"></i> Delete
+               </button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   const deleteModalElement = document.getElementById('deleteConfirmModal');
+   const deleteModal = new bootstrap.Modal(deleteModalElement);
+   const deleteForm = document.getElementById('deleteConfirmForm');
+   const deleteModalDetails = document.getElementById('deleteModalDetails');
+   const deleteModalWarning = document.getElementById('deleteModalWarning');
+   
+   // Handle delete button clicks
+   document.querySelectorAll('[data-delete-action]').forEach(function(button) {
+      button.addEventListener('click', function(e) {
+         e.preventDefault();
+         
+         const deleteUrl = this.getAttribute('data-delete-url');
+         const itemType = this.getAttribute('data-item-type') || 'item';
+         const itemName = this.getAttribute('data-item-name') || '';
+         const detailsHtml = this.getAttribute('data-item-details') || '';
+         const warningText = this.getAttribute('data-warning') || `You are about to delete this ${itemType}. This action cannot be undone.`;
+         
+         // Set form action
+         deleteForm.action = deleteUrl;
+         
+         // Set warning text
+         deleteModalWarning.textContent = warningText;
+         
+         // Set details - decode HTML entities
+         if (detailsHtml) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = detailsHtml.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+            deleteModalDetails.innerHTML = tempDiv.innerHTML;
+         } else {
+            deleteModalDetails.innerHTML = `<p><strong>Item:</strong> ${itemName}</p>`;
+         }
+         
+         // Show modal
+         deleteModal.show();
+      });
+   });
+});
+</script>
+

@@ -1,0 +1,102 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+
+<section class="signup-sec full-screen">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-xl-5 col-md-5">
+        <div class="signup-thumb">
+          <img class="img-fluid" src="{% static 'images/signup-2.png' %}" alt="Sign Up" />
+        </div>
+      </div>
+      <div class="col-xl-7 col-md-7">
+        <div class="signup-form">
+          <h1 class="display-3 text-center mb-5">Sign Up</h1>
+          
+          {% if messages %}
+            <div class="mb-4">
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'person:sign_up' %}">
+            {% csrf_token %}
+
+            <div class="form-group position-relative mb-3">
+              <span><i class="feather-icon icon-user"></i></span>
+              <input type="text" name="name" class="form-control form-control-lg" placeholder="Full Name" required>
+            </div>
+
+            <div class="form-group position-relative mb-3">
+              <span><i class="feather-icon icon-mail"></i></span>
+              <input type="email" name="email" class="form-control form-control-lg" placeholder="Email Address" required>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group position-relative mb-3">
+                  <span><i class="feather-icon icon-lock"></i></span>
+                  <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group position-relative mb-3">
+                  <span><i class="feather-icon icon-lock"></i></span>
+                  <input type="password" name="confirm_password" class="form-control form-control-lg" placeholder="Confirm Password" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group position-relative mb-3">
+                  <span><i class="feather-icon icon-calendar"></i></span>
+                  <input type="number" name="age" class="form-control form-control-lg" placeholder="Age" min="1" max="120">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group position-relative mb-3">
+                  <span><i class=""></i></span>
+                  <select name="role" class="form-control form-control-lg" id="role-select">
+                    <option value="">Select Role</option>
+                    {% if roles %}
+                      {% for role in roles %}
+                        <option value="{{ role.uri }}">{{ role.label }}</option>
+                      {% endfor %}
+                    {% else %}
+                      <option value="" disabled>No roles available - check SPARQL endpoint</option>
+                    {% endif %}
+                  </select>
+                  {% if not roles %}
+                  <small class="form-text text-warning">
+                    <i class="feather-icon icon-alert-triangle"></i> 
+                    No roles found. Please ensure your ontology is loaded into the SPARQL endpoint.
+                  </small>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary w-100 btn-lg" type="submit">Sign Up</button>
+
+            <div class="form-footer mt-4 text-center">
+              <p>
+                Already have an account?
+                <a href="{% url 'person:sign_in' %}" class="text-primary fw-bold">Sign In Now</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

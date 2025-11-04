@@ -1,0 +1,859 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}{% if evenement %}Modifier{% else %}Créer{% endif %} Événement{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+
+{% get_static_prefix as STATIC_PREFIX %}
+<section class="promo-sec position-relative overflow-hidden"
+ style="background: linear-gradient(135deg, rgba(99,102,241,.95) 0%, rgba(139,92,246,.95) 100%); padding:60px 0;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="display-4 text-white fw-bold mb-3">
+          {% if evenement %}<i class="feather-icon icon-edit-3"></i> Modifier l'Événement
+          {% else %}<i class="feather-icon icon-plus-circle"></i> Créer un Événement{% endif %}
+        </h1>
+        <p class="text-white-50 fs-5 mb-4">
+          {% if evenement %}Mettez à jour les informations de votre événement{% else %}
+          Ajoutez un nouvel événement{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+
+        <div class="card border-0 shadow-lg custom-card">
+          <div class="card-header bg-gradient-primary text-white py-4">
+            <div class="d-flex align-items-center justify-content-center">
+              <div class="icon-wrapper bg-white-20 me-3">
+                <i class="feather-icon {% if evenement %}icon-edit-3{% else %}icon-plus-circle{% endif %} text-white"></i>
+              </div>
+              <h2 class="h4 mb-0">
+                {% if evenement %}Modifier l'Événement{% else %}Créer un Événement{% endif %}
+              </h2>
+            </div>
+          </div>
+          <div class="card-body p-5">
+            <form method="post" enctype="multipart/form-data" id="eventForm">
+              {% csrf_token %}
+
+              <!-- Type Événement -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-tag me-2"></i>
+                  Type d'Événement *
+                </label>
+                <div class="input-with-icon">
+                  <i class="feather-icon icon-chevron-down input-icon select-chevron"></i>
+                  <select name="typeEvenement" id="typeEvenement" class="form-control" required>
+                    <option value="">Sélectionnez un type</option>
+                    <option value="Hackathon" {% if evenement and evenement.typeEvenement == "Hackathon" %}selected{% endif %}>Hackathon</option>
+                    <option value="Workshop" {% if evenement and evenement.typeEvenement == "Workshop" %}selected{% endif %}>Workshop</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Nom Événement -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-edit me-2"></i>
+                  Nom de l'Événement *
+                </label>
+                <div class="input-with-icon">
+                  <i class="feather-icon icon-type input-icon"></i>
+                  <input type="text" name="nomEvenement" id="nomEvenement" class="form-control-custom"
+                  value="{{ evenement.nomEvenement|default:'' }}" required placeholder="Ex: AI Hackathon 2025">
+                </div>
+              </div>
+
+              <!-- Description avec bouton IA -->
+              <div class="form-group-custom mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <label class="form-label-custom">
+                    <i class="feather-icon icon-align-left me-2"></i>
+                    Description *
+                  </label>
+                  <button type="button" class="btn btn-outline-primary btn-sm" id="generate-description">
+                    <i class="feather-icon icon-zap me-1"></i>
+                    Générer avec IA
+                  </button>
+                </div>
+                <div class="input-with-icon">
+                  <i class="feather-icon icon-file-text input-icon textarea-icon"></i>
+                  <textarea class="form-control-custom" rows="5" name="description" id="description" required
+                  placeholder="Décrivez votre événement...">{{ evenement.description|default:'' }}</textarea>
+                </div>
+                <div class="form-text">
+                  <small class="text-muted">Cliquez sur "Générer avec IA" pour créer une description automatique</small>
+                </div>
+              </div>
+
+              <!-- Section Génération d'Image IA -->
+              <div class="form-group-custom mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <label class="form-label-custom">
+                    <i class="feather-icon icon-image me-2"></i>
+                    Image de l'Événement
+                  </label>
+                  <button type="button" class="btn btn-outline-success btn-sm" id="generate-image-button">
+                    <i class="feather-icon icon-cpu me-1"></i>
+                    Générer une image avec IA
+                  </button>
+                </div>
+                
+                <!-- Conteneur pour l'aperçu de l'image générée -->
+                <div id="generated-image-container" class="text-center mb-3" style="display: none;">
+                  <div class="image-preview">
+                    <img id="generated-image-preview" src="" alt="Image générée" class="preview-img">
+                    <div class="image-overlay">
+                      <span class="preview-text">Image générée par IA</span>
+                    </div>
+                  </div>
+                  <small class="text-muted mt-2 d-block">Image générée automatiquement à partir du titre</small>
+                </div>
+                
+                <!-- Champ caché pour stocker le chemin de l'image générée -->
+                <input type="hidden" name="generated_image_path" id="generated_image_path">
+                
+                <!-- Upload manuel -->
+                <div class="input-with-icon">
+                  <i class="feather-icon icon-upload input-icon"></i>
+                  <input type="file" name="image" class="form-control-custom file-input" accept="image/*" id="manual-image-input">
+                </div>
+                
+                <div class="form-text">
+                  <small class="text-muted">
+                    Vous pouvez uploader une image manuellement ou en générer une automatiquement avec l'IA
+                  </small>
+                </div>
+              </div>
+
+              <!-- Lieu -->
+              <div class="form-group-custom mb-4">
+                <label class="form-label-custom">
+                  <i class="feather-icon icon-map-pin me-2"></i>
+                  Lieu *
+                </label>
+                <div class="input-with-icon">
+                  <i class="feather-icon icon-navigation input-icon"></i>
+                  <input type="text" name="lieu" class="form-control-custom"
+                  value="{{ evenement.lieu|default:'' }}" required placeholder="Ex: Tunis, ENSI">
+                </div>
+              </div>
+
+              <!-- Dates -->
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <div class="form-group-custom">
+                    <label class="form-label-custom">
+                      <i class="feather-icon icon-calendar me-2"></i>
+                      Date Début *
+                    </label>
+                    <div class="input-with-icon">
+                      <i class="feather-icon icon-clock input-icon"></i>
+                      <input type="date" name="dateDebut" class="form-control-custom" required value="{{ evenement.dateDebut|default:'' }}">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group-custom">
+                    <label class="form-label-custom">
+                      <i class="feather-icon icon-calendar me-2"></i>
+                      Date Fin *
+                    </label>
+                    <div class="input-with-icon">
+                      <i class="feather-icon icon-clock input-icon"></i>
+                      <input type="date" name="dateFin" class="form-control-custom" required value="{{ evenement.dateFin|default:'' }}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions mt-5 pt-4 border-top">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button type="submit" class="btn btn-custom-primary">
+                    <i class="feather-icon icon-save me-2"></i>
+                    {% if evenement %} Mettre à jour {% else %} Créer l'événement {% endif %}
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary-color: #6c757d;
+  --success-color: #10b981;
+  --border-color: #e2e8f0;
+  --shadow-light: 0 2px 15px rgba(0,0,0,0.08);
+  --shadow-medium: 0 5px 25px rgba(0,0,0,0.1);
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.custom-card {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+.card-header.bg-gradient-primary {
+  background: var(--gradient-primary) !important;
+  border: none;
+}
+
+.icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+/* Labels */
+.form-label-custom {
+  color: #1e293b !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+/* Form Groups */
+.form-group-custom {
+  position: relative;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-color);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.select-chevron {
+  right: 15px !important;
+  left: auto !important;
+  color: #64748b !important;
+}
+
+.textarea-icon {
+  top: 20px;
+  transform: none;
+}
+
+/* Form Controls */
+.form-control-custom {
+  width: 100%;
+  padding: 14px 16px 14px 45px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  color: #334155;
+}
+
+.form-control-custom:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.form-control-custom::placeholder {
+  color: #94a3b8;
+}
+
+/* Select Specific Styles */
+.select-custom {
+  appearance: none;
+  background: #fff;
+  cursor: pointer;
+  padding-right: 45px;
+}
+
+.select-custom:focus {
+  background: #fff;
+}
+
+.select-custom option {
+  padding: 12px;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.select-custom option:first-child {
+  color: #94a3b8;
+}
+
+.select-custom option:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* File Input */
+.file-input {
+  cursor: pointer;
+}
+
+.file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+.file-input::before {
+  content: 'Choisir un fichier';
+  display: inline-block;
+  background: var(--gradient-primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin-right: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Buttons */
+.btn-custom-primary {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-custom-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  color: white;
+}
+
+.btn-custom-secondary {
+  background: #fff;
+  border: 2px solid var(--border-color);
+  color: var(--secondary-color);
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.btn-custom-secondary:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+/* Image Preview */
+.current-image {
+  text-align: center;
+}
+
+.image-preview {
+  position: relative;
+  display: inline-block;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.preview-img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-preview:hover .image-overlay {
+  opacity: 1;
+}
+
+.image-preview:hover .preview-img {
+  transform: scale(1.05);
+}
+
+.preview-text {
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Form Actions */
+.form-actions {
+  border-top: 1px solid var(--border-color);
+}
+
+/* Style pour le bouton IA */
+#generate-description {
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--primary-color);
+  background: transparent;
+  color: var(--primary-color);
+}
+
+#generate-description:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  background: var(--primary-color);
+  color: white;
+}
+
+#generate-description:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Style pour le bouton génération image */
+#generate-image-button {
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--success-color);
+  background: transparent;
+  color: var(--success-color);
+}
+
+#generate-image-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  background: var(--success-color);
+  color: white;
+}
+
+#generate-image-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading {
+  position: relative;
+  color: transparent;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin: -8px 0 0 -8px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-right-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert-ia {
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  font-size: 0.875rem;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.alert-ia.warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.alert-ia.danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Animation pour l'image générée */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#generated-image-container.show {
+  animation: fadeInUp 0.5s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 2rem !important;
+  }
+  
+  .btn-custom-primary,
+  .btn-custom-secondary {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .d-md-flex {
+    flex-direction: column;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-group-custom {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.form-group-custom:nth-child(1) { animation-delay: 0.1s; }
+.form-group-custom:nth-child(2) { animation-delay: 0.2s; }
+.form-group-custom:nth-child(3) { animation-delay: 0.3s; }
+.form-group-custom:nth-child(4) { animation-delay: 0.4s; }
+.form-group-custom:nth-child(5) { animation-delay: 0.5s; }
+.form-group-custom:nth-child(6) { animation-delay: 0.6s; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Fonctionnalité de génération IA
+  const generateBtn = document.getElementById('generate-description');
+  const titleInput = document.getElementById('nomEvenement');
+  const typeInput = document.getElementById('typeEvenement');
+  const descriptionInput = document.getElementById('description');
+  
+  // Vérifier que tous les éléments existent
+  if (!generateBtn || !titleInput || !typeInput || !descriptionInput) {
+    console.error('Un ou plusieurs éléments du formulaire sont manquants');
+    return;
+  }
+  
+  // Fonction pour générer la description
+  generateBtn.addEventListener('click', function() {
+    const title = titleInput.value.trim();
+    const eventType = typeInput.value;
+    
+    console.log('Titre:', title, 'Type:', eventType);
+    
+    if (!title) {
+      showAlert('Veuillez d\'abord saisir le nom de l\'événement', 'warning');
+      return;
+    }
+    
+    if (!eventType) {
+      showAlert('Veuillez sélectionner un type d\'événement', 'warning');
+      return;
+    }
+    
+    // Afficher le loading
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<i class="feather-icon icon-loader"></i> Génération...';
+    generateBtn.classList.add('loading');
+    
+    // Appel AJAX à l'API
+    fetch('{% url "evenement:generate_description" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ 
+        title: title,
+        event_type: eventType
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur réseau: ' + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.description) {
+        descriptionInput.value = data.description;
+        showAlert('Description générée avec succès!', 'success');
+      } else if (data.error) {
+        throw new Error(data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      showAlert('Erreur lors de la génération: ' + error.message, 'danger');
+    })
+    .finally(() => {
+      // Réinitialiser le bouton
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = '<i class="feather-icon icon-zap me-1"></i>Générer avec IA';
+      generateBtn.classList.remove('loading');
+    });
+  });
+  
+  // Fonction pour afficher les alertes
+  function showAlert(message, type) {
+    // Supprimer les anciennes alertes
+    const oldAlert = document.querySelector('.alert-ia');
+    if (oldAlert) {
+      oldAlert.remove();
+    }
+    
+    // Créer la nouvelle alerte
+    const alert = document.createElement('div');
+    alert.className = `alert-ia ${type === 'warning' ? 'warning' : type === 'danger' ? 'danger' : ''}`;
+    alert.textContent = message;
+    
+    // Insérer après le textarea
+    descriptionInput.parentNode.insertBefore(alert, descriptionInput.nextSibling);
+    
+    // Supprimer automatiquement après 5 secondes
+    setTimeout(() => {
+      if (alert.parentNode) {
+        alert.remove();
+      }
+    }, 5000);
+  }
+  
+  // ==================== FONCTIONNALITÉ GÉNÉRATION D'IMAGE ====================
+  
+  const generateImageBtn = document.getElementById('generate-image-button');
+  const generatedImageContainer = document.getElementById('generated-image-container');
+  const generatedImagePreview = document.getElementById('generated-image-preview');
+  const generatedImagePath = document.getElementById('generated_image_path');
+  const manualImageInput = document.getElementById('manual-image-input');
+  
+  // Vérifier que les éléments existent
+  if (generateImageBtn && generatedImageContainer) {
+    
+    generateImageBtn.addEventListener('click', function() {
+      const title = titleInput.value.trim();
+      const eventType = typeInput.value;
+      
+      console.log('Génération image - Titre:', title, 'Type:', eventType);
+      
+      if (!title) {
+        alert('Veuillez d\'abord saisir le nom de l\'événement');
+        titleInput.focus();
+        return;
+      }
+      
+      if (!eventType) {
+        alert('Veuillez sélectionner un type d\'événement');
+        typeInput.focus();
+        return;
+      }
+      
+      // Afficher le loading
+      generateImageBtn.disabled = true;
+      generateImageBtn.innerHTML = '<i class="feather-icon icon-loader"></i> Génération...';
+      generateImageBtn.classList.add('loading');
+      
+      // Appel AJAX à l'API de génération d'image
+      fetch('{% url "evenement:generate_image" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ 
+          title: title,
+          event_type: eventType
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erreur serveur: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success && data.image_url) {
+          // Afficher l'image générée
+          generatedImagePreview.src = data.image_url;
+          generatedImagePath.value = data.image_path;
+          generatedImageContainer.style.display = 'block';
+          generatedImageContainer.classList.add('show');
+          
+          // Désactiver l'upload manuel
+          if (manualImageInput) {
+            manualImageInput.disabled = true;
+          }
+          
+          alert('✅ Image générée avec succès!');
+          
+          // Scroll vers l'image
+          generatedImageContainer.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+          
+        } else if (data.error) {
+          throw new Error(data.error);
+        }
+      })
+      .catch(error => {
+    console.error('Erreur génération image:', error);
+
+    if (error.message.includes('503') || error.message.includes('indisponible')) {
+        alert('⚠️ Service momentanément indisponible. Une image de démo sera affichée.');
+    } else {
+        alert('❌ Erreur : ' + error.message);
+    }
+})
+
+      .finally(() => {
+        // Réinitialiser le bouton
+        generateImageBtn.disabled = false;
+        generateImageBtn.innerHTML = '<i class="feather-icon icon-cpu me-1"></i>Générer une image avec IA';
+        generateImageBtn.classList.remove('loading');
+      });
+    });
+    
+    // Réactiver l'upload manuel si l'utilisateur veut changer
+    if (manualImageInput) {
+      manualImageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          // Désactiver l'image générée
+          generatedImageContainer.style.display = 'none';
+          generatedImagePath.value = '';
+          this.disabled = false;
+        }
+      });
+    }
+  }
+  
+  // ==================== FIN FONCTIONNALITÉ GÉNÉRATION D'IMAGE ====================
+  
+  // Animation pour les champs de formulaire existants...
+  const dateInputs = document.querySelectorAll('input[type="date"]');
+  const fileInput = document.querySelector('input[type="file"]');
+  
+  // Amélioration des champs date
+  dateInputs.forEach(input => {
+    input.addEventListener('focus', function() {
+      this.parentElement.parentElement.style.transform = 'scale(1.02)';
+    });
+    
+    input.addEventListener('blur', function() {
+      this.parentElement.parentElement.style.transform = 'scale(1)';
+    });
+  });
+  
+  // Preview pour les nouvelles images
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          // Créer ou mettre à jour l'aperçu
+          let preview = document.querySelector('.image-preview');
+          if (!preview) {
+            const currentImageDiv = document.querySelector('.current-image') || document.createElement('div');
+            currentImageDiv.className = 'current-image mt-3';
+            
+            const label = document.createElement('label');
+            label.className = 'form-label-custom text-muted mb-2';
+            label.innerHTML = '<i class="feather-icon icon-eye me-2"></i> Nouvel aperçu';
+            
+            preview = document.createElement('div');
+            preview.className = 'image-preview';
+            
+            const img = document.createElement('img');
+            img.className = 'preview-img';
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'image-overlay';
+            overlay.innerHTML = '<span class="preview-text">Aperçu</span>';
+            
+            preview.appendChild(img);
+            preview.appendChild(overlay);
+            currentImageDiv.appendChild(label);
+            currentImageDiv.appendChild(preview);
+            
+            fileInput.parentElement.parentElement.appendChild(currentImageDiv);
+          }
+          
+          const img = preview.querySelector('img');
+          img.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+});
+</script>
+
+{% include 'trelix_app/footer.html' %}
+{% endblock %}
