@@ -1,0 +1,144 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}{{ activity.activity_name }} - Activity Details{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+<section class="blog-page-2 sec-padding">
+    <div class="container">
+       <div class="row">
+          <div class="col-lg-8 mx-auto">
+             <div class="card shadow-1 rounded-3 border">
+                <div class="card-header bg-primary text-white">
+                   <div class="d-flex justify-content-between align-items-center">
+                      <h2 class="display-5 mb-0">
+                         <i class="feather-icon icon-activity"></i> {{ activity.activity_name }}
+                      </h2>
+                      <div class="btn-group">
+                         <a href="{% url 'activity:activity_list' %}" class="btn btn-light btn-sm">
+                            <i class="feather-icon icon-arrow-left"></i> Back to List
+                         </a>
+                         {% if request.user.is_authenticated %}
+                         {% if activity.instructor_uri == request.user.uri or request.user.is_admin %}
+                         <a href="{% url 'activity:activity_edit' activity.uri %}" class="btn btn-light btn-sm">
+                            <i class="feather-icon icon-edit"></i> Edit
+                         </a>
+                         {% endif %}
+                         {% endif %}
+                      </div>
+                   </div>
+                </div>
+                <div class="card-body p-4">
+                   {% if messages %}
+                      <div class="mb-4">
+                         {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                               {{ message }}
+                               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                         {% endfor %}
+                      </div>
+                   {% endif %}
+                   
+                   <div class="activity-details">
+                      {% if activity.description %}
+                      <div class="mb-4">
+                         <h4 class="mb-3">Description</h4>
+                         <p class="lead">{{ activity.description }}</p>
+                      </div>
+                      {% endif %}
+                      
+                      <div class="row mb-4">
+                         <div class="col-md-6">
+                            <div class="info-item mb-3">
+                               <h5><i class="feather-icon icon-clock text-primary"></i> Duration</h5>
+                               <p class="mb-0">
+                                  {% if activity.duration %}
+                                     {{ activity.duration }} minutes
+                                  {% else %}
+                                     <span class="text-muted">Not specified</span>
+                                  {% endif %}
+                               </p>
+                            </div>
+                         </div>
+                         
+                         <div class="col-md-6">
+                            <div class="info-item mb-3">
+                               <h5><i class="feather-icon icon-tag text-primary"></i> Type</h5>
+                               <p class="mb-0">
+                                  {% if activity.type %}
+                                     {{ activity.type }}
+                                  {% else %}
+                                     <span class="text-muted">Not specified</span>
+                                  {% endif %}
+                               </p>
+                            </div>
+                         </div>
+                      </div>
+                      
+                      <div class="row mb-4">
+                         <div class="col-md-6">
+                            <div class="info-item mb-3">
+                               <h5><i class="feather-icon icon-calendar text-primary"></i> Start Date</h5>
+                               <p class="mb-0">
+                                  {% if activity.start_date %}
+                                     {{ activity.start_date|slice:":16" }}
+                                  {% else %}
+                                     <span class="text-muted">Not specified</span>
+                                  {% endif %}
+                               </p>
+                            </div>
+                         </div>
+                         
+                         <div class="col-md-6">
+                            <div class="info-item mb-3">
+                               <h5><i class="feather-icon icon-calendar text-primary"></i> End Date</h5>
+                               <p class="mb-0">
+                                  {% if activity.end_date %}
+                                     {{ activity.end_date|slice:":16" }}
+                                  {% else %}
+                                     <span class="text-muted">Not specified</span>
+                                  {% endif %}
+                               </p>
+                            </div>
+                         </div>
+                      </div>
+                      
+                      <div class="row mb-4">
+                         <div class="col-md-6">
+                            <div class="info-item mb-3">
+                               <h5><i class="feather-icon icon-check-circle text-primary"></i> Status</h5>
+                               <p class="mb-0">
+                                  {% if activity.status %}
+                                  <span class="badge bg-{% if activity.status == 'Completed' %}success{% elif activity.status == 'Active' %}primary{% elif activity.status == 'Pending' %}warning text-dark{% else %}secondary{% endif %}">
+                                    {{ activity.status }}
+                                </span>
+                                  {% else %}
+                                     <span class="text-muted">Not specified</span>
+                                  {% endif %}
+                               </p>
+                            </div>
+                         </div>
+                         
+                         <div class="col-md-6">
+                            <div class="info-item mb-3">
+                               <h5><i class="feather-icon icon-user text-primary"></i> Instructor</h5>
+                               <p class="mb-0">
+                                  {% if activity.instructor_name %}
+                                     {{ activity.instructor_name }}
+                                  {% else %}
+                                     <span class="text-muted">Not assigned</span>
+                                  {% endif %}
+                               </p>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+</section>
+{% include 'trelix_app/footer.html' %}
+{% endblock %}
+

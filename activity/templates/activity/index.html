@@ -1,0 +1,189 @@
+{% extends "trelix_app/base.html" %}
+{% load static %}
+{% block title %}Activities{% endblock %}
+{% block content %}
+{% include 'trelix_app/header.html' %}
+{% include 'trelix_app/delete_confirm_modal.html' %}
+<section class="blog-page-2 sec-padding">
+    <div class="container">
+       <div class="row">
+          <div class="col-lg-4">
+             <aside class="sidebar ps-lg-4">
+                <div class="widget search-widget">
+                   <form method="get" action="{% url 'activity:activity_list' %}" class="position-relative">
+                      {% if status_filter %}
+                      <input type="hidden" name="status" value="{{ status_filter }}">
+                      {% endif %}
+                      <input type="search" name="search" placeholder="Search by activity name" 
+                             value="{{ search_query }}" class="form-control">
+                      <button type="submit" class="btn btn-primary position-absolute top-0"><i class="feather-icon icon-search"></i></button>
+                   </form>
+                </div>
+                <div class="widget category-widget">
+                   <h3 class="widget-title">Filter by Status</h3>
+                   <div class="widget-inner">
+                      <ul>
+                         <li>
+                            <a href="?status=Pending{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" 
+                               class="{% if status_filter|lower == 'pending' %}active{% endif %}">
+                               Pending Activities<span><i class="feather-icon icon-chevron-right"></i></span>
+                            </a>
+                         </li>
+                         <li>
+                            <a href="?status=Active{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" 
+                               class="{% if status_filter|lower == 'active' %}active{% endif %}">
+                               Active Activities<span><i class="feather-icon icon-chevron-right"></i></span>
+                            </a>
+                         </li>
+                         <li>
+                            <a href="?status=Completed{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" 
+                               class="{% if status_filter|lower == 'completed' %}active{% endif %}">
+                               Completed Activities<span><i class="feather-icon icon-chevron-right"></i></span>
+                            </a>
+                         </li>
+                         <li>
+                            <a href="?status=Cancelled{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" 
+                               class="{% if status_filter|lower == 'cancelled' %}active{% endif %}">
+                               Cancelled Activities<span><i class="feather-icon icon-chevron-right"></i></span>
+                            </a>
+                         </li>
+                      </ul>
+                      {% if has_filters %}
+                      <div class="mt-3">
+                         <a href="{% url 'activity:activity_list' %}" class="btn btn-sm btn-secondary w-100">
+                            <i class="feather-icon icon-x"></i> Reset Filters
+                         </a>
+                      </div>
+                      {% endif %}
+                   </div>
+                </div>
+             </aside>
+          </div>
+          <div class="col-lg-8 ps-3">
+             <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                   <h2 class="display-5 mb-1">Activities</h2>
+                   {% if has_filters %}
+                   <div class="d-flex align-items-center gap-2 flex-wrap">
+                      {% if status_filter %}
+                      <span class="badge bg-info">
+                         <i class="feather-icon icon-filter"></i> Status: {{ status_filter }}
+                         <a href="?{% if search_query %}search={{ search_query|urlencode }}{% endif %}" class="text-white ms-1">
+                            <i class="feather-icon icon-x"></i>
+                         </a>
+                      </span>
+                      {% endif %}
+                      {% if search_query %}
+                      <span class="badge bg-info">
+                         <i class="feather-icon icon-search"></i> Search: "{{ search_query }}"
+                         <a href="?{% if status_filter %}status={{ status_filter }}{% endif %}" class="text-white ms-1">
+                            <i class="feather-icon icon-x"></i>
+                         </a>
+                      </span>
+                      {% endif %}
+                   </div>
+                   {% endif %}
+                </div>
+                {% if request.user.is_authenticated and request.user.can_create %}
+                <a href="{% url 'activity:activity_create' %}" class="btn btn-primary">
+                   <i class="feather-icon icon-plus"></i> Add New Activity
+                </a>
+                {% endif %}
+             </div>
+             {% if messages %}
+                <div class="mb-4">
+                   {% for message in messages %}
+                      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                         {{ message }}
+                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                   {% endfor %}
+                </div>
+             {% endif %}
+             <div class="blog-lists">
+                {% if activities %}
+                   {% for activity in activities %}
+                      <div class="list-entry d-md-flex bg-info border shadow-1 rounded-3 align-items-center mb-3">
+                         <div class="entry-media p-3">
+                            <div class="rounded-4 bg-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                               <i class="feather-icon icon-activity text-white" style="font-size: 48px;"></i>
+                            </div>
+                         </div>
+                         <div class="entry-content flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                               <h3 class="display-4 mb-0">
+                                  <a href="{% url 'activity:activity_detail' activity.uri %}" class="text-decoration-none">
+                                     {{ activity.activity_name }}
+                                  </a>
+                               </h3>
+                               {% if request.user.is_authenticated %}
+                                  {% if activity.instructor_uri == request.user.uri or request.user.is_admin %}
+                                  <div class="btn-group ms-3">
+                                     <a href="{% url 'activity:activity_edit' activity.uri %}" 
+                                        class="btn btn-sm btn-primary" 
+                                        title="Edit Activity">
+                                        <i class="feather-icon icon-edit"></i> Edit
+                                     </a>
+                                     <button type="button"
+                                        class="btn btn-sm btn-danger" 
+                                        title="Delete Activity"
+                                        data-delete-action
+                                        data-delete-url="{% url 'activity:activity_delete' activity.uri %}"
+                                        data-item-type="activity"
+                                        data-item-name="{{ activity.activity_name }}"
+                                        data-warning="You are about to delete this activity. This action cannot be undone."
+                                        data-item-details="<h6 class=&quot;mb-3&quot;>Activity Details:</h6><table class=&quot;table table-bordered table-sm&quot;><tr><th>Name:</th><td><strong>{{ activity.activity_name }}</strong></td></tr>{% if activity.description %}<tr><th>Description:</th><td>{{ activity.description|truncatewords:15 }}</td></tr>{% endif %}{% if activity.instructor_name %}<tr><th>Instructor:</th><td>{{ activity.instructor_name }}</td></tr>{% endif %}{% if activity.status %}<tr><th>Status:</th><td><span class=&quot;badge bg-primary&quot;>{{ activity.status }}</span></td></tr>{% endif %}</table>">
+                                        <i class="feather-icon icon-trash-2"></i> Delete
+                                     </button>
+                                  </div>
+                                  {% endif %}
+                               {% endif %}
+                            </div>
+                            {% if activity.description %}
+                               <p>{{ activity.description|truncatewords:30 }}</p>
+                            {% endif %}
+                            <div class="entry-meta border-top pt-3">
+                               {% if activity.duration %}
+                                  <span><i class="feather-icon icon-clock"></i> Duration: {{ activity.duration }} min</span>
+                               {% endif %}
+                               {% if activity.start_date %}
+                                  <span><i class="feather-icon icon-calendar"></i> Start: {{ activity.start_date|slice:":10" }}</span>
+                               {% endif %}
+                               {% if activity.status %}
+                                  <span><i class="feather-icon icon-check-circle"></i> {{ activity.status }}</span>
+                               {% endif %}
+                               {% if activity.type %}
+                                  <span><i class="feather-icon icon-tag"></i> {{ activity.type }}</span>
+                               {% endif %}
+                               {% if activity.instructor_name %}
+                                  <span><i class="feather-icon icon-user"></i> Instructor: {{ activity.instructor_name }}</span>
+                               {% endif %}
+                            </div>
+                         </div>
+                      </div>
+                   {% endfor %}
+                {% else %}
+                   <div class="alert alert-info text-center">
+                      <h4>No activities found</h4>
+                      {% if has_filters %}
+                      <p>No activities match your current filters.</p>
+                      <a href="{% url 'activity:activity_list' %}" class="btn btn-secondary mt-2">
+                         <i class="feather-icon icon-x"></i> Clear Filters
+                      </a>
+                      {% else %}
+                      <p>Get started by creating your first activity!</p>
+                      {% if request.user.is_authenticated and request.user.can_create %}
+                      <a href="{% url 'activity:activity_create' %}" class="btn btn-primary mt-2">
+                         <i class="feather-icon icon-plus"></i> Add New Activity
+                      </a>
+                      {% endif %}
+                      {% endif %}
+                   </div>
+                {% endif %}
+             </div>
+          </div>
+       </div>
+    </div>
+</section>
+{% include 'trelix_app/footer.html' %}
+{% endblock %}

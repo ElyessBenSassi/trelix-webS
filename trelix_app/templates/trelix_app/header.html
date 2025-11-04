@@ -116,7 +116,7 @@
   <div class="header-nav-wrapper header-sticky">
     <nav class="navbar nav-center navbar-expand-xl">
       <div class="container navbar-line px-3">
-        <a class="navbar-brand d-xl-none" href="#">
+        <a class="navbar-brand d-xl-none" href="{% url 'home' %}">
           <img src="{% static 'images/trelix.png' %}" alt="Logo" />
         </a>
         <div class="header-actions position-relative order-xl-2 d-flex align-items-center justify-content-between">
@@ -154,25 +154,32 @@
                       <i class="feather-icon icon-user"></i><span>My Profile</span>
                     </a>
                   </li>
+                  {% if request.user.is_authenticated and request.user.is_admin %}
+                  <li>
+                    <a class="nav-link" href="{% url 'person:admin_persons' %}">
+                      <i class="feather-icon icon-users"></i><span>All Persons</span>
+                    </a>
+                  </li>
+                  {% endif %}
                     <li>
                     <a class="nav-link" href="#">
                       <i class="feather-icon icon-video"></i><span>create meeting</span>
                     </a>
                   </li>
                   <li>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'person:sign_out' %}">
                       <i class="feather-icon icon-log-out"></i><span>Logout</span>
                     </a>
                   </li>
                 
                 {% else %}
                   <li>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'person:sign_in' %}">
                       <i class="feather-icon icon-log-in"></i><span>Sign In</span>
                     </a>
                   </li>
                   <li>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'person:sign_up' %}">
                       <i class="feather-icon icon-user-plus"></i><span>Sign Up</span>
                     </a>
                   </li>
@@ -186,25 +193,24 @@
         </button>
         <div class="offcanvas offcanvas-start offcanvas-nav">
           <div class="offcanvas-header">
-            <a href="#" class="text-inverse">
+            <a href="{% url 'home' %}" class="text-inverse">
               <img src="{% static 'images/trelix.png' %}" alt="logo" />
             </a>
             <button type="button" class="btn-close bg-primary" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div class="offcanvas-body pt-0 align-items-center justify-content-between">
             <ul class="navbar-nav align-items-lg-center">
-              <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-              <li class="nav-item"><a class="nav-link" href="/modules">Modules</a></li>
-              <li class="nav-item"><a class="nav-link" href="/produit">Produit</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="/modules/">Modules</a></li>
+              <li class="nav-item"><a class="nav-link" href="/produit/">Produit</a></li>
               <li class="nav-item"><a class="nav-link" href="#">Exams</a></li>
-              <li class="nav-item"><a class="nav-link" href="evenements/create">Evenement</a></li>
+              <li class="nav-item"><a class="nav-link" href="/evenements/create/">Evenement</a></li>
               <li class="nav-item"><a class="nav-link" href="#">Quiz</a></li>
-             <li class="nav-item"><a class="nav-link" href="#">Badges</a>
-</li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'activity:activity_list' %}">Activities</a></li>
 
                
             </ul>
-            <a class="navbar-brand d-none d-xl-block m-0" href="#">
+            <a class="navbar-brand d-none d-xl-block m-0" href="{% url 'home' %}">
               <img src="{% static 'images/trelix.png' %}" alt="Logo" />
             </a>
           </div>
