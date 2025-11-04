@@ -1,7 +1,7 @@
 import uuid, urllib.parse, os
 from django.shortcuts import render, redirect
 from django.conf import settings
-from .sparql_client import insert_evenement,add_participation,check_participation, get_participations ,get_evenements, update_evenement, delete_evenement, get_evenement_by_uri
+from .sparql_client import insert_evenement, add_participation, check_participation, get_participations, get_evenements, update_evenement, delete_evenement, get_evenement_by_uri
 import google.generativeai as genai
 import json
 from django.http import JsonResponse
@@ -13,6 +13,244 @@ from django.core.files import File
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+
+# Configuration de l'API Gemini (existant)
+genai.configure(api_key=settings.GOOGLE_API_KEY)
+
+# =============================================================================
+# RECHERCHE SÉMANTIQUE AVEC GOOGLE GEMINI
+# =============================================================================
+
+@csrf_exempt
+def semantic_search(request):
+    """Recherche sémantique avec Google Gemini"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            query = data.get('query', '').strip()
+            
+            if not query:
+                return JsonResponse({'error': 'La requête est vide'}, status=400)
+            
+            print(f"🔍 Recherche sémantique: '{query}'")
+            
+            # Générer une requête SPARQL avec Gemini
+            sparql_query = generate_semantic_sparql(query)
+            
+            if not sparql_query:
+                return JsonResponse({'error': 'Impossible de générer la requête'}, status=500)
+            
+            # Exécuter la requête SPARQL
+            results = execute_semantic_search(sparql_query)
+            
+            return JsonResponse({
+                'success': True,
+                'results': results,
+                'query': query,
+                'count': len(results)
+            })
+            
+        except Exception as e:
+            print(f"❌ Erreur recherche sémantique: {str(e)}")
+            return JsonResponse({'error': f'Erreur: {str(e)}'}, status=500)
+    
+    return JsonResponse({'error': 'Méthode non autorisée'}, status=400)
+
+def generate_semantic_sparql(natural_language_query):
+    """Génère une requête SPARQL avec Google Gemini"""
+    try:
+        print(f"🔗 Utilisation de Gemini pour: {natural_language_query}")
+        
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        
+        prompt = f"""
+        Tu es un expert SPARQL. Convertis cette requête en langage naturel en une requête SPARQL valide.
+        
+        Ontologie:
+        - Prefix: ex: <http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#>
+        - Classes: HackathonEvent, WorkshopEvent
+        - Propriétés: nomEvenement, description, lieu, dateDebut, dateFin, image
+        - Base URI: http://example.com/evenement/
+
+        Règles IMPORTANTES:
+        1. TOUJOURS sélectionner: ?evenement ?nomEvenement ?description ?lieu ?dateDebut ?dateFin ?image
+        2. Le champ ?evenement doit avoir l'URI complète
+        3. Utiliser FILTER avec regex pour la recherche texte
+        4. Réponds UNIQUEMENT avec la requête SPARQL complète, sans explications
+
+        Exemples:
+        - "événements qui commencent par M" → FILTER regex(?nomEvenement, "^M", "i")
+        - "hackathons à Paris" → FILTER regex(?lieu, "Paris", "i") && ?evenement a ex:HackathonEvent
+        - "workshops sur l'IA" → FILTER regex(?description, "IA", "i") && ?evenement a ex:WorkshopEvent
+        - "événements de ce mois" → FILTER (month(?dateDebut) = month(now()) && year(?dateDebut) = year(now()))
+
+        Requête à convertir: "{natural_language_query}"
+        """
+        
+        response = model.generate_content(prompt)
+        sparql_query = response.text.strip()
+        
+        # Nettoyer la réponse
+        sparql_query = sparql_query.replace('```sparql', '').replace('```', '').strip()
+        
+        print(f"📝 Requête SPARQL générée: {sparql_query}")
+        return sparql_query
+        
+    except Exception as e:
+        print(f"❌ Erreur Gemini: {str(e)}")
+        return generate_fallback_sparql(natural_language_query)
+
+def generate_fallback_sparql(query):
+    """Fallback intelligent sans IA - Version améliorée"""
+    query_lower = query.lower()
+    
+    print(f"🔄 Utilisation du fallback pour: {query}")
+    
+    # Détection des motifs courants
+    words = query_lower.split()
+    
+    # Recherche par première lettre
+    if any(word in ['commence', 'début', 'start', 'première', 'lettre'] for word in words):
+        for word in words:
+            if len(word) == 1 and word.isalpha():
+                letter = word.upper()
+                return f"""
+                PREFIX ex: <http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#>
+                SELECT ?evenement ?nomEvenement ?description ?lieu ?dateDebut ?dateFin ?image
+                WHERE {{
+                    ?evenement a ?type ;
+                             ex:nomEvenement ?nomEvenement ;
+                             ex:description ?description ;
+                             ex:lieu ?lieu ;
+                             ex:dateDebut ?dateDebut ;
+                             ex:dateFin ?dateFin ;
+                             OPTIONAL {{ ?evenement ex:image ?image . }}
+                    FILTER (regex(?nomEvenement, "^{letter}", "i"))
+                }}
+                """
+        # Si pas de lettre trouvée mais la requête contient "par X"
+        if 'par' in words:
+            idx = words.index('par')
+            if idx + 1 < len(words) and len(words[idx + 1]) == 1:
+                letter = words[idx + 1].upper()
+                return f"""
+                PREFIX ex: <http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#>
+                SELECT ?evenement ?nomEvenement ?description ?lieu ?dateDebut ?dateFin ?image
+                WHERE {{
+                    ?evenement a ?type ;
+                             ex:nomEvenement ?nomEvenement ;
+                             ex:description ?description ;
+                             ex:lieu ?lieu ;
+                             ex:dateDebut ?dateDebut ;
+                             ex:dateFin ?dateFin ;
+                             OPTIONAL {{ ?evenement ex:image ?image . }}
+                    FILTER (regex(?nomEvenement, "^{letter}", "i"))
+                }}
+                """
+    
+    # Recherche par type d'événement
+    event_type = None
+    if any(word in ['hackathon', 'hack'] for word in words):
+        event_type = "HackathonEvent"
+    elif any(word in ['workshop', 'atelier'] for word in words):
+        event_type = "WorkshopEvent"
+    
+    # Recherche par lieu
+    location = None
+    location_keywords = ['à', 'dans', 'ville', 'lieu', 'place', 'localisation', 'paris', 'france', 'afrique']
+    for word in words:
+        if word in location_keywords:
+            # Chercher le mot suivant comme lieu
+            idx = words.index(word)
+            if idx + 1 < len(words) and len(words[idx + 1]) > 2:
+                location = words[idx + 1].capitalize()
+                break
+    
+    # Recherche par contenu
+    content_keywords = ['intelligence', 'artificielle', 'ia', 'ai', 'technologie', 'programmation']
+    content = None
+    for word in words:
+        if word in content_keywords:
+            content = word
+            break
+    
+    # Construction de la requête
+    conditions = []
+    
+    if event_type:
+        conditions.append(f"?evenement a ex:{event_type}")
+    
+    if location:
+        conditions.append(f'FILTER (regex(?lieu, "{location}", "i"))')
+    
+    if content:
+        conditions.append(f'FILTER (regex(?description, "{content}", "i"))')
+    
+    # Si pas de conditions spécifiques, recherche générale
+    if not conditions:
+        # Nettoyer la query pour la recherche
+        clean_query = " ".join([word for word in words if len(word) > 2])
+        if clean_query:
+            conditions.append(f'FILTER (regex(?nomEvenement, "{clean_query}", "i") || regex(?description, "{clean_query}", "i") || regex(?lieu, "{clean_query}", "i"))')
+        else:
+            conditions.append(f'FILTER (regex(?nomEvenement, "{query}", "i") || regex(?description, "{query}", "i") || regex(?lieu, "{query}", "i"))')
+    
+    where_clause = " ;\n                 ".join(conditions)
+    
+    sparql_query = f"""
+    PREFIX ex: <http://www.semanticweb.org/bazinfo/ontologies/2025/9/untitled-ontology-15#>
+    SELECT ?evenement ?nomEvenement ?description ?lieu ?dateDebut ?dateFin ?image
+    WHERE {{
+        ?evenement a ?type ;
+                 ex:nomEvenement ?nomEvenement ;
+                 ex:description ?description ;
+                 ex:lieu ?lieu ;
+                 ex:dateDebut ?dateDebut ;
+                 ex:dateFin ?dateFin ;
+                 OPTIONAL {{ ?evenement ex:image ?image . }}
+        {where_clause}
+    }}
+    """
+    
+    print(f"📝 Requête fallback générée: {sparql_query}")
+    return sparql_query
+
+def execute_semantic_search(sparql_query):
+    """Exécute la requête SPARQL et retourne les résultats"""
+    try:
+        from SPARQLWrapper import SPARQLWrapper, JSON
+        
+        sparql = SPARQLWrapper("http://localhost:3030/trelix/query")
+        sparql.setQuery(sparql_query)
+        sparql.setReturnFormat(JSON)
+        results = sparql.query().convert()
+        
+        events = []
+        for r in results["results"]["bindings"]:
+            event_uri = r["evenement"]["value"]
+            event_id = event_uri.replace("http://example.com/evenement/", "")
+            
+            event_data = {
+                "uri": event_id,
+                "nomEvenement": r["nomEvenement"]["value"],
+                "description": r["description"]["value"],
+                "lieu": r["lieu"]["value"],
+                "dateDebut": r["dateDebut"]["value"],
+                "dateFin": r["dateFin"]["value"],
+                "image": r.get("image", {}).get("value", "") if "image" in r else "",
+            }
+            events.append(event_data)
+        
+        print(f"✅ {len(events)} événements trouvés")
+        return events
+        
+    except Exception as e:
+        print(f"❌ Erreur exécution SPARQL: {str(e)}")
+        return []
+
+# =============================================================================
+# VUES EXISTANTES
+# =============================================================================
 
 @login_required
 def participer_evenement(request, uri):
@@ -164,6 +402,7 @@ def create_simple_image(title, event_type):
         
         # Ajouter du texte stylisé
         try:
+            from PIL import ImageFont
             # Essayer différentes polices
             fonts = []
             try:
@@ -265,9 +504,6 @@ def generate_image(request):
             return JsonResponse({'error': f'Erreur: {str(e)}'}, status=500)
 
     return JsonResponse({'error': 'Méthode non autorisée'}, status=400)
-
-# Configuration de l'API Gemini
-genai.configure(api_key=settings.GOOGLE_API_KEY)
 
 def ai_generate_description(title, event_type):
     """Génère une description d'événement"""

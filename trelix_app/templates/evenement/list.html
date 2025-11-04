@@ -32,10 +32,62 @@
             <h2 class="display-6 fw-bold text-dark mb-3">Découvrez nos prochains événements</h2>
             <p class="text-muted fs-5">Participez à des expériences uniques et enrichissantes</p>
          </div>
-         <div class="col-lg-4 text-lg-end">
-            <a href="{% url 'evenement:evenement_create' %}" class="btn btn-primary btn-lg rounded-pill px-4">
-               <i class="feather-icon icon-plus me-2"></i>Créer un événement
-            </a>
+         
+      </div>
+
+      <!-- RECHERCHE SÉMANTIQUE AVEC IA -->
+      <div class="row mb-4">
+         <div class="col-12">
+            <div class="card border-0 shadow-sm bg-gradient-primary text-white">
+               <div class="card-body p-4">
+                  <div class="row align-items-center">
+                     <div class="col-lg-8 mb-3 mb-lg-0">
+                        <h4 class="fw-bold mb-2">
+                           <i class="feather-icon icon-search me-2"></i>
+                           Recherche Intelligente par IA
+                        </h4>
+                        <p class="mb-0 opacity-75">Posez votre question en langage naturel pour trouver des événements</p>
+                     </div>
+                     <div class="col-lg-4">
+                        <div class="input-group">
+                           <input type="text" 
+                                  class="form-control rounded-pill border-0" 
+                                  id="semanticSearchInput" 
+                                  placeholder="Ex: événements qui commencent par M...">
+                           <button class="btn btn-warning rounded-pill px-4 ms-2" id="semanticSearchBtn">
+                              <i class="feather-icon icon-search"></i>
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+                  
+                  <!-- Exemples de requêtes -->
+               
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- RÉSULTATS DE RECHERCHE SÉMANTIQUE -->
+      <div class="row d-none" id="semanticResultsSection">
+         <div class="col-12">
+            <div class="card border-0 shadow-sm mb-4">
+               <div class="card-header bg-transparent border-0 py-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <h5 class="mb-0">
+                        <i class="feather-icon icon-zap text-warning me-2"></i>
+                        Résultats de la recherche IA
+                     </h5>
+                     <button class="btn btn-sm btn-outline-secondary" id="clearSemanticSearch">
+                        <i class="feather-icon icon-x me-1"></i>
+                        Effacer
+                     </button>
+                  </div>
+               </div>
+               <div class="card-body">
+                  <div id="semanticResultsContainer"></div>
+               </div>
+            </div>
          </div>
       </div>
 
@@ -521,6 +573,47 @@
    left: 100%;
 }
 
+/* Styles pour la recherche sémantique */
+.bg-gradient-primary {
+   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+}
+
+.query-example {
+   transition: all 0.3s ease;
+   border: 1px solid rgba(255,255,255,0.3);
+}
+
+.query-example:hover {
+   background: rgba(255,255,255,0.2) !important;
+   border-color: rgba(255,255,255,0.5);
+   transform: translateY(-2px);
+}
+
+#semanticResultsContainer .card {
+   transition: all 0.3s ease;
+}
+
+#semanticResultsContainer .card:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Animation pour les résultats */
+@keyframes slideInDown {
+   from {
+      opacity: 0;
+      transform: translateY(-20px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+#semanticResultsSection {
+   animation: slideInDown 0.5s ease;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
    .event-thumb {
@@ -570,6 +663,10 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // =============================================================================
+    // FILTRES EXISTANTS
+    // =============================================================================
+    
     // Éléments DOM
     const searchInput = document.getElementById('searchInput');
     const clearSearch = document.getElementById('clearSearch');
@@ -616,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
             activeFilterCount++;
         }
 
-        // Filtre par type - CORRECTION ICI : utiliser la valeur exacte "HackathonEvent" ou "WorkshopEvent"
+        // Filtre par type
         if (filters.type) {
             visibleItems = visibleItems.filter(item => 
                 item.dataset.eventType === filters.type
@@ -709,7 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Événements
+    // Événements pour les filtres existants
     searchInput.addEventListener('input', function() {
         filters.search = this.value;
         applyFilters();
@@ -788,7 +885,176 @@ document.addEventListener('DOMContentLoaded', function() {
         resetFilters.click();
     });
 
-    // Initialiser l'interface
+    // =============================================================================
+    // RECHERCHE SÉMANTIQUE AVEC DEEPSEEK API
+    // =============================================================================
+
+    const semanticSearchInput = document.getElementById('semanticSearchInput');
+    const semanticSearchBtn = document.getElementById('semanticSearchBtn');
+    const semanticResultsSection = document.getElementById('semanticResultsSection');
+    const semanticResultsContainer = document.getElementById('semanticResultsContainer');
+    const clearSemanticSearch = document.getElementById('clearSemanticSearch');
+    const queryExamples = document.querySelectorAll('.query-example');
+
+    // Recherche sémantique
+    semanticSearchBtn.addEventListener('click', performSemanticSearch);
+    semanticSearchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSemanticSearch();
+        }
+    });
+
+    // Exemples de requêtes
+    queryExamples.forEach(btn => {
+        btn.addEventListener('click', function() {
+            semanticSearchInput.value = this.dataset.query;
+            performSemanticSearch();
+        });
+    });
+
+    // Effacer la recherche
+    clearSemanticSearch.addEventListener('click', function() {
+        semanticResultsSection.classList.add('d-none');
+        semanticResultsContainer.innerHTML = '';
+        semanticSearchInput.value = '';
+        eventsContainer.classList.remove('d-none');
+        noResultsState.classList.add('d-none');
+    });
+
+    async function performSemanticSearch() {
+        const query = semanticSearchInput.value.trim();
+        
+        if (!query) {
+            showSemanticError('Veuillez entrer une requête de recherche');
+            return;
+        }
+
+        // Afficher le loading
+        showSemanticLoading(query);
+
+        try {
+            const response = await fetch("{% url 'evenement:semantic_search' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ query: query })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                displaySemanticResults(data.results, query);
+            } else {
+                showSemanticError(data.error || 'Erreur lors de la recherche');
+            }
+        } catch (error) {
+            console.error('Erreur recherche sémantique:', error);
+            showSemanticError('Erreur de connexion au serveur');
+        }
+    }
+
+    function showSemanticLoading(query) {
+        semanticResultsContainer.innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-warning mb-3" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="text-muted">Recherche intelligente: "${query}"</p>
+                <small class="text-muted">L'IA analyse votre requête...</small>
+            </div>
+        `;
+        semanticResultsSection.classList.remove('d-none');
+        eventsContainer.classList.add('d-none');
+        noResultsState.classList.add('d-none');
+    }
+
+    function displaySemanticResults(results, query) {
+        if (results.length === 0) {
+            semanticResultsContainer.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="feather-icon icon-search display-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucun résultat trouvé</h5>
+                    <p class="text-muted">Aucun événement ne correspond à: "${query}"</p>
+                    <small class="text-muted">Essayez avec d'autres termes</small>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="mb-3">
+                <span class="badge bg-warning text-dark">
+                    <i class="feather-icon icon-check me-1"></i>
+                    ${results.length} résultat(s) trouvé(s) pour: "${query}"
+                </span>
+            </div>
+            <div class="row g-3">
+        `;
+
+        results.forEach(event => {
+            const isUpcoming = new Date(event.dateFin) >= new Date();
+            const imageUrl = event.image ? `/media/${event.image}` : '{% static "images/event-default.jpg" %}';
+            
+            html += `
+                <div class="col-xl-4 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-img-top position-relative overflow-hidden" style="height: 180px;">
+                            <img src="${imageUrl}" class="card-img-top h-100" style="object-fit: cover;" alt="${event.nomEvenement}">
+                            <span class="position-absolute top-0 end-0 m-2 badge ${isUpcoming ? 'bg-success' : 'bg-secondary'}">
+                                ${isUpcoming ? 'À venir' : 'Terminé'}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title fw-bold">${event.nomEvenement}</h6>
+                            <p class="card-text text-muted small">${event.description}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="feather-icon icon-map-pin me-1"></i>
+                                    ${event.lieu}
+                                </small>
+                                <a href="{% url 'evenement:detail_evenement' '${event.uri}' %}" class="btn btn-primary btn-sm">
+                                    Voir détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        semanticResultsContainer.innerHTML = html;
+    }
+
+    function showSemanticError(message) {
+        semanticResultsContainer.innerHTML = `
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="feather-icon icon-alert-triangle me-2"></i>
+                <div>${message}</div>
+            </div>
+        `;
+        semanticResultsSection.classList.remove('d-none');
+    }
+
+    // Fonction utilitaire pour récupérer le token CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Initialiser l'interface des filtres
     applyFilters();
 });
 </script>

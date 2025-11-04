@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY')  # Remplacez par votre clé réelle
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
