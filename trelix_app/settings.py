@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'trelix_app',
     'activity',
-    'person'
+    'person',
     'module',
     'produit',
     'evenement',
