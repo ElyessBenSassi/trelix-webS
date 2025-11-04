@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .result-title {
+            font-size: 2rem;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .score-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .score-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-percentage {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        .performance-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .performance-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.8s ease-out;
+        }
+
+        .message {
+            font-size: 1.1rem;
+            color: #666;
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .result-card {
+                padding: 2rem;
+            }
+
+            .result-title {
+                font-size: 1.5rem;
+            }
+
+            .score-value {
+                font-size: 2.5rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="result-card">
+            {% if score_percentage >= 80 %}
+                <div class="result-icon">🎉</div>
+                <div class="result-title">Outstanding!</div>
+            {% elif score_percentage >= 60 %}
+                <div class="result-icon">👍</div>
+                <div class="result-title">Great Job!</div>
+            {% else %}
+                <div class="result-icon">💪</div>
+                <div class="result-title">Good Try!</div>
+            {% endif %}
+
+            <div class="score-container">
+                <div class="score-label">Your Score</div>
+                <div class="score-value">{{ score }}/{{ total }}</div>
+                <div class="score-percentage">{{ score_percentage|floatformat:0 }}%</div>
+                <div class="performance-bar">
+                    <div class="performance-fill" style="width: {{ score_percentage }}%"></div>
+                </div>
+            </div>
+
+            {% if score_percentage >= 80 %}
+                <div class="message">
+                    Excellent performance! You've mastered this quiz content. Keep up the great work!
+                </div>
+            {% elif score_percentage >= 60 %}
+                <div class="message">
+                    Nice work! You've demonstrated a solid understanding. Review the missed questions to improve further.
+                </div>
+            {% else %}
+                <div class="message">
+                    Good effort! Review the material and try again to improve your score.
+                </div>
+            {% endif %}
+
+            <div class="divider"></div>
+
+            <div class="actions">
+                <a href="{% url 'quiz_leaderboard' quiz_id %}" class="btn btn-primary">🏆 View Leaderboard</a>
+                <a href="{% url 'join_quiz' quiz_id %}" class="btn btn-secondary">Try Again</a>
+                <a href="{% url 'quiz_list' %}" class="btn btn-secondary">Back to Quizzes</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

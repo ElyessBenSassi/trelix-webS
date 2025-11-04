@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Details</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        .quiz-detail-card {
+            background: white;
+            border-radius: 16px;
+            padding: 50px 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .quiz-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .quiz-meta {
+            display: flex;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        .difficulty-easy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty-hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .quiz-description {
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.8;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .quiz-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            padding: 20px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-box {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-box-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .info-box-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .info-box-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 40px;
+            color: white;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .stats-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-detail-card {
+                padding: 30px 20px;
+            }
+
+            .quiz-title {
+                font-size: 1.8rem;
+            }
+
+            .quiz-meta {
+                gap: 15px;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .back-link {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'quiz_list' %}" class="back-link">← Back to Quizzes</a>
+
+        <div class="quiz-detail-card">
+            <h1 class="quiz-title">{{ title }}</h1>
+            
+            {% if quiz.difficulty %}
+                <span class="difficulty-badge difficulty-{{ quiz.difficulty|lower }}">
+                    {{ quiz.difficulty }} Level
+                </span>
+            {% endif %}
+
+            {% if quiz.description %}
+                <div class="quiz-description">
+                    {{ quiz.description }}
+                </div>
+            {% else %}
+                <div class="quiz-description">
+                    Test your knowledge and see how you rank on the leaderboard!
+                </div>
+            {% endif %}
+
+            <div class="quiz-meta">
+                {% if quiz.question_count %}
+                    <div class="meta-item">
+                        <span class="meta-label">Questions</span>
+                        <span class="meta-value">{{ quiz.question_count }}</span>
+                    </div>
+                {% endif %}
+                {% if quiz.time_limit %}
+                    <div class="meta-item">
+                        <span class="meta-label">Time Limit</span>
+                        <span class="meta-value">{{ quiz.time_limit }} min</span>
+                    </div>
+                {% endif %}
+                {% if quiz.participants %}
+                    <div class="meta-item">
+                        <span class="meta-label">Participants</span>
+                        <span class="meta-value">{{ quiz.participants }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="quiz-info-grid">
+                <div class="info-box">
+                    <div class="info-box-icon">📝</div>
+                    <div class="info-box-value">{{ quiz.question_count|default:"N/A" }}</div>
+                    <div class="info-box-label">Total Questions</div>
+                </div>
+                {% if quiz.avg_score %}
+                    <div class="info-box">
+                        <div class="info-box-icon">⭐</div>
+                        <div class="info-box-value">{{ quiz.avg_score }}%</div>
+                        <div class="info-box-label">Avg Score</div>
+                    </div>
+                {% endif %}
+                {% if quiz.participants %}
+                    <div class="info-box">
+                        <div class="info-box-icon">👥</div>
+                        <div class="info-box-value">{{ quiz.participants }}</div>
+                        <div class="info-box-label">Have Attempted</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="action-buttons">
+                <a href="{% url 'join_quiz' quiz_id %}" class="btn btn-primary">Start Quiz</a>
+                <a href="{% url 'quiz_leaderboard' quiz_id %}" class="btn btn-secondary">View Leaderboard</a>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h3>Ready to Challenge Yourself?</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ quiz.question_count|default:"0" }}</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ quiz.difficulty|default:"Mixed" }}</div>
+                    <div class="stat-label">Difficulty</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ quiz.time_limit|default:"No" }} limit</div>
+                    <div class="stat-label">Time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
