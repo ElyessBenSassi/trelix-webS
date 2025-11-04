@@ -16,6 +16,8 @@ urlpatterns = [
     path("generate-image/", views.generate_image, name="generate_image"),
     path("participer/<str:uri>/", views.participer_evenement, name="participer_evenement"),
     path("mes-participations/", views.mes_participations, name="mes_participations"),
+    path("semantic-search/", views.semantic_search, name="semantic_search"),  # NOUVELLE ROUTE
+
 
 
 
