@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from urllib.parse import unquote
 from .sparql_service import ActivitySPARQLService
 from .models import Activity
+from .utils import ActivityTipsSuggestions
 
 
 def activity_list(request):
@@ -27,7 +31,6 @@ def activity_list(request):
 
 
 def activity_detail(request, activity_uri):
-    from urllib.parse import unquote
     sparql_service = ActivitySPARQLService()
     # Decode the URI if it was URL-encoded
     activity_uri_decoded = unquote(activity_uri)
@@ -44,6 +47,50 @@ def activity_detail(request, activity_uri):
     }
     
     return render(request, 'activity/detail.html', context)
+
+
+@require_http_methods(["GET"])
+def get_tips_and_suggestions(request, activity_uri):
+    try:
+        # Decode the URI if it was URL-encoded
+        activity_uri_decoded = unquote(activity_uri)
+        sparql_service = ActivitySPARQLService()
+        activity_data = sparql_service.get_activity_by_uri(activity_uri_decoded)
+        
+        if not activity_data:
+            return JsonResponse({
+                'success': False,
+                'error': 'Activity not found.'
+            }, status=404)
+        
+        # Initialize the tips and suggestions service
+        tips_suggestions_service = ActivityTipsSuggestions()
+        
+        # Get activity details
+        activity_name = activity_data.get('activity_name', '')
+        activity_description = activity_data.get('description', '')
+        
+        # Get tips
+        tips = tips_suggestions_service.get_tips(activity_name, activity_description)
+        
+        # Get suggestions
+        suggestions = tips_suggestions_service.generate_suggestions(activity_uri_decoded)
+        
+        return JsonResponse({
+            'success': True,
+            'tips': tips,
+            'suggestions': suggestions
+        })
+    except ValueError as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'An error occurred: {str(e)}'
+        }, status=500)
 
 
 def activity_create(request):
@@ -104,8 +151,6 @@ def activity_create(request):
 
 
 def activity_delete(request, activity_uri):
-    from urllib.parse import unquote
-    
     if request.method != 'POST':
         messages.error(request, 'Invalid request method.')
         return redirect('activity:activity_list')
@@ -146,8 +191,6 @@ def activity_delete(request, activity_uri):
 
 
 def activity_edit(request, activity_uri):
-    from urllib.parse import unquote
-    
     if not request.user.is_authenticated:
         messages.error(request, 'You must be logged in to edit an activity.')
         return redirect('person:sign_in')

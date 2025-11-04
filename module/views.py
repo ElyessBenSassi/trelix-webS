@@ -6,14 +6,12 @@ from django.conf import settings
 from django.http import JsonResponse
 
 from .sparql_client import insert_module, get_modules, update_module, delete_module, get_module_content
+from .semantic_search import semantic_search
 from huggingface_hub import InferenceClient
 import requests
 
 
-
-
-
-# Génération automatique d'une URI “safe”
+# Génération automatique d'une URI "safe"
 def generate_uri(nomModule):
     safe_name = nomModule.replace(" ", "_")
     return f"{safe_name}{uuid.uuid4().hex[:8]}"
@@ -41,7 +39,7 @@ def module_update(request):
     uri = request.GET.get("uri")
     if not uri:
         return redirect("module_list")
-    uri = urllib.parse.unquote(uri)  # décoder l’URI
+    uri = urllib.parse.unquote(uri)  # décoder l'URI
 
     modules = get_modules()
     module = next((m for m in modules if m["uri"] == uri), None)
@@ -65,19 +63,16 @@ def module_delete(request):
     return redirect("module_list")
 
 def generate_quiz(request):
-    uri = request.GET.get("uri")  # Récupère l'URI du module depuis la query string
+    uri = request.GET.get("uri")
     if not uri:
         return JsonResponse({"error": "Module URI missing"}, status=400)
 
-    # Récupérer le contenu du module
     content = get_module_content(uri)
     if not content:
         return JsonResponse({"error": "Module has no content"}, status=400)
 
-    # Initialiser le client HuggingFace DeepSeek
     client = InferenceClient(token=settings.HF_API_TOKEN)
 
-    # Prompt pour DeepSeek
     prompt = f"""
 Créez un petit quiz (3 questions) en français basé sur le texte suivant :
 ---
@@ -96,7 +91,6 @@ Format strictement en JSON, comme ceci :
 Ne fournissez aucun texte ou explication supplémentaire en dehors du tableau JSON.
 """
 
-    # Appel à l'API
     completion = client.chat.completions.create(
         model="deepseek-ai/DeepSeek-V3-0324",
         messages=[{"role": "user", "content": prompt}],
@@ -104,11 +98,9 @@ Ne fournissez aucun texte ou explication supplémentaire en dehors du tableau JS
 
     raw_text = completion.choices[0].message["content"]
 
-    # Nettoyer et convertir en JSON
     try:
         clean_text = raw_text.strip().strip("```").replace("json", "").strip()
         quiz_json = json.loads(clean_text)
-        # transformer options pour le front
         for q in quiz_json:
             q['options'] = [{"label": opt, "value": opt} for opt in q.get('options', [])]
     except json.JSONDecodeError:
@@ -124,12 +116,10 @@ def summarize_module(request):
     if not uri:
         return JsonResponse({"error": "Module URI missing"}, status=400)
 
-    # Récupérer le contenu depuis Fuseki
     content = get_module_content(uri)
     if not content:
         return JsonResponse({"error": "Module has no content"}, status=400)
 
-    # Appel à NLP Cloud pour le résumé
     url = f"https://api.nlpcloud.io/v1/{settings.NLP_CLOUD_MODEL}/summarization"
     headers = {
         "Authorization": f"Token {settings.NLP_CLOUD_API_KEY}",
@@ -151,3 +141,38 @@ def summarize_module(request):
             return JsonResponse({"error": f"NLP API returned status {response.status_code}"}, status=response.status_code)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+from django.http import JsonResponse
+import json
+
+def semantic_search_view(request):
+    """
+    Vue pour la recherche sémantique avec support des requêtes en langage naturel.
+    Compatible avec POST JSON ou GET classique.
+    """
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            query = data.get("query", "").strip()
+        except Exception as e:
+            return JsonResponse({"error": f"Invalid JSON: {e}"}, status=400)
+    else:
+        query = request.GET.get("q", "").strip()
+
+    if not query:
+        return JsonResponse({"error": "Missing query"}, status=400)
+
+    try:
+        print(f"🧠 Requête utilisateur : {query}")
+        results = semantic_search(query)
+        print(f"✅ {len(results)} résultats trouvés")
+
+        return JsonResponse({
+            "success": True,
+            "query": query,
+            "count": len(results),
+            "results": results
+        })
+    except Exception as e:
+        print(f"💥 Erreur recherche sémantique : {e}")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
