@@ -12,10 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -41,6 +43,10 @@ INSTALLED_APPS = [
     'trelix_app',
     'activity',
     'person'
+    'module',
+    'produit',
+    'evenement',
+    'preference',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +137,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# NLP Cloud
+NLP_CLOUD_API_KEY = os.getenv('NLP_CLOUD_API_KEY')
+NLP_CLOUD_MODEL = os.getenv('NLP_CLOUD_MODEL')
+
+# HUGGINGFACE API TOKEN
+HF_API_TOKEN=os.getenv('HF_API_TOKEN')
