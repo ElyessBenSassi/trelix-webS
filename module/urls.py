@@ -8,4 +8,6 @@ urlpatterns = [
     path("delete/", views.module_delete, name="module_delete"),  # URI via GET
     path('generate_quiz/', views.generate_quiz, name='generate_quiz'),
     path('summarize/', views.summarize_module, name='summarize_module'),
+    path("search_semantic/", views.semantic_search_view, name="semantic_search"),
+
 ]
